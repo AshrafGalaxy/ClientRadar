@@ -332,7 +332,19 @@ def main():
         .score-panel {
             background: #111827 !important;
             border: 1px solid #1F2937 !important;
-            border-left: 3px solid #10B981 !important;
+            border-left: 4px solid #10B981 !important;
+        }
+        .score-badge {
+            background: rgba(16, 185, 129, 0.15) !important;
+            color: #34D399 !important;
+            border: 1px solid rgba(16, 185, 129, 0.3) !important;
+        }
+        .stTabs [aria-selected="true"] {
+            color: #60A5FA !important;
+            border-bottom: 2px solid #3B82F6 !important;
+        }
+        .stTabs [data-baseweb="tab"] {
+            color: #94A3B8 !important;
         }
         .desc-box {
             background: #111827 !important;
@@ -425,7 +437,19 @@ def main():
         .score-panel {
             background: #F0FDF4 !important;
             border: 1px solid #DCFCE7 !important;
-            border-left: 3px solid #16A34A !important;
+            border-left: 4px solid #16A34A !important;
+        }
+        .score-badge {
+            background: #DCFCE7 !important;
+            color: #15803D !important;
+            border: 1px solid #BBF7D0 !important;
+        }
+        .stTabs [aria-selected="true"] {
+            color: #2563EB !important;
+            border-bottom: 2px solid #2563EB !important;
+        }
+        .stTabs [data-baseweb="tab"] {
+            color: #64748B !important;
         }
         .desc-box {
             background: #FFFFFF !important;
@@ -538,6 +562,38 @@ def main():
             font-size: 0.88rem;
             line-height: 1.55;
             margin-top: 4px;
+        }}
+        
+        /* Viability Scorecard Panel */
+        .score-panel {{
+            border-radius: 10px !important;
+            padding: 16px 20px !important;
+            margin: 14px 0 18px 0 !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+        }}
+        
+        .score-badge {{
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 10px;
+            border-radius: 9999px;
+            font-weight: 700;
+            font-size: 0.92rem;
+            letter-spacing: -0.01em;
+        }}
+
+        /* Clean Tab Navigation */
+        .stTabs [data-baseweb="tab-list"] {{
+            gap: 8px !important;
+            padding-bottom: 2px !important;
+        }}
+        .stTabs [data-baseweb="tab"] {{
+            border-radius: 6px 6px 0 0 !important;
+            padding: 8px 16px !important;
+            font-weight: 600 !important;
+            font-size: 0.88rem !important;
+            border: none !important;
+            background: transparent !important;
         }}
         
         /* Rendered Email Preview Container */
@@ -843,22 +899,38 @@ def main():
                 else:
                     st.markdown("---")
                     
-                    # Clean Score Callout
+                    # Clean Score Callout with ample padding and rich hierarchy
                     score = res.get("score", 90)
                     st.markdown(f"""
                     <div class="score-panel">
-                        <div style="display: flex; align-items: center; justify-content: space-between;">
-                            <div>
-                                <strong style="font-size: 0.95rem;">Viability Score:</strong>
-                                <span style="font-size: 1.15rem; font-weight: 700; color: #10B981; margin-left: 6px;">{score}/100</span>
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    {svg_icon('shield', size=19, color='#10B981' if is_dark else '#16A34A')}
+                                    <span style="font-size: 0.96rem; font-weight: 700; letter-spacing: -0.01em;">Viability Score</span>
+                                </div>
+                                <span class="score-badge">{score}/100</span>
                             </div>
-                            <div style="font-size: 0.8rem; color: #94A3B8;">Gemma 2 Analysis</div>
+                            <div style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.78rem; font-weight: 600; color: {'#94A3B8' if is_dark else '#64748B'}; background: {'rgba(255,255,255,0.05)' if is_dark else 'rgba(0,0,0,0.04)'}; padding: 3px 8px; border-radius: 6px;">
+                                {svg_icon('sparkles', size=12, color='#60A5FA' if is_dark else '#2563EB')}
+                                <span>Gemma 2 Analysis</span>
+                            </div>
                         </div>
-                        <div style="font-size: 0.85rem; margin-top: 6px;">
-                            <strong>Scope Clarity:</strong> {res.get('scope_clarity', 'Clear contractor scope.')}
-                        </div>
-                        <div style="font-size: 0.85rem; color: #94A3B8; margin-top: 3px;">
-                            <strong>Red Flags:</strong> {res.get('red_flags', 'None detected')}
+                        <div style="display: grid; grid-template-columns: 1fr; gap: 8px; border-top: 1px solid {'#1F2937' if is_dark else '#DCFCE7'}; padding-top: 10px;">
+                            <div style="font-size: 0.88rem; line-height: 1.5; display: flex; align-items: baseline; gap: 8px;">
+                                <span style="color: #10B981; font-weight: 700; font-size: 0.9rem;">✓</span>
+                                <div>
+                                    <strong style="color: {'#F8FAFC' if is_dark else '#0F172A'};">Scope Clarity:</strong>
+                                    <span style="color: {'#CBD5E1' if is_dark else '#334155'}; margin-left: 4px;">{res.get('scope_clarity', 'Well-defined contractor scope.')}</span>
+                                </div>
+                            </div>
+                            <div style="font-size: 0.88rem; line-height: 1.5; display: flex; align-items: baseline; gap: 8px;">
+                                <span style="color: {'#10B981' if res.get('red_flags', 'None detected') == 'None detected' else '#EF4444'}; font-weight: 700; font-size: 0.9rem;">{'✓' if res.get('red_flags', 'None detected') == 'None detected' else '⚠'}</span>
+                                <div>
+                                    <strong style="color: {'#F8FAFC' if is_dark else '#0F172A'};">Risk Audit:</strong>
+                                    <span style="color: {'#94A3B8' if is_dark else '#64748B'}; margin-left: 4px;">{res.get('red_flags', 'None detected')}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
@@ -869,21 +941,21 @@ def main():
                     tab_preview, tab_raw = st.tabs(["✉️ Rendered Pitch Preview", "📝 Edit Raw Markdown"])
                     
                     with tab_preview:
-                        st.markdown(f"""
-                        <div class="email-preview">
-                            <div style="font-size: 0.92rem; font-weight: 700; margin-bottom: 8px; color: {'#60A5FA' if is_dark else '#2563EB'};">
-                                Subject: {res.get('subject', '')}
-                            </div>
-                            <hr style="border: none; border-top: 1px solid {'#1F2937' if is_dark else '#E2E8F0'}; margin: 8px 0 14px 0;" />
-                        """, unsafe_allow_html=True)
-                        st.markdown(pitch_content)
-                        st.markdown("</div>", unsafe_allow_html=True)
+                        with st.container(border=True):
+                            c_sub, c_tag = st.columns([3.5, 1])
+                            with c_sub:
+                                st.markdown(f"<span style='font-size: 0.78rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em; color: {'#94A3B8' if is_dark else '#64748B'};'>Subject</span><div style='font-size: 0.96rem; font-weight: 700; color: {'#60A5FA' if is_dark else '#1D4ED8'}; margin-top: 1px;'>{res.get('subject', '')}</div>", unsafe_allow_html=True)
+                            with c_tag:
+                                st.markdown(f"<div style='text-align: right;'><span class='tag-chip' style='font-size: 0.78rem;'>{tone}</span></div>", unsafe_allow_html=True)
+                            
+                            st.divider()
+                            st.markdown(pitch_content)
                         
                     with tab_raw:
                         st.text_input("Subject:", value=res.get("subject", ""), key=f"subj_{i}")
-                        st.text_area("Raw Markdown:", value=pitch_content, height=180, key=f"pitch_text_{i}")
+                        st.text_area("Raw Markdown:", value=pitch_content, height=200, key=f"pitch_text_{i}")
                     
-                    # 1-Click Download
+                    # 1-Click Download Action Bar
                     full_export = f"""# Proposal for {lead['title']}
 **Company:** {lead['company_name']}
 **Source:** {lead['via']}
@@ -896,13 +968,18 @@ def main():
 
 {pitch_content}
 """
-                    st.download_button(
-                        label=f"Download Proposal ({lead['company_name']}.md)",
-                        data=full_export,
-                        file_name=f"proposal_{lead['company_name'].lower().replace(' ', '_')}.md",
-                        mime="text/markdown",
-                        key=f"dl_btn_{i}"
-                    )
+                    c_dl, c_hint = st.columns([1.5, 1])
+                    with c_dl:
+                        st.download_button(
+                            label=f"📥 Download Proposal ({lead['company_name']}.md)",
+                            data=full_export,
+                            file_name=f"proposal_{lead['company_name'].lower().replace(' ', '_')}.md",
+                            mime="text/markdown",
+                            key=f"dl_btn_{i}",
+                            use_container_width=True
+                        )
+                    with c_hint:
+                        st.caption("Ready to send via email or job portal.")
 
 if __name__ == "__main__":
     main()
