@@ -1,6 +1,7 @@
 # 🎯 ClientRadar AI
 
-> Autonomous freelance lead-arbitrage engine powered by **SerpApi** and **Google Gemma 2**. Built for the Hacktoberfest Open-Source AI Challenge (Week 2: Side Hustle).
+> Autonomous freelance lead-arbitrage engine powered by **SerpApi** and **Google Gemma 2**.  
+> Built for the Hacktoberfest open source AI challenge.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.35+-FF4B4B.svg)](https://streamlit.io)
@@ -9,21 +10,14 @@
 
 ---
 
-## 💡 Overview & Business Thesis
+## 💡 Overview
 Freelancers and boutique technical consultants spend 10-15 hours every week scanning job boards, filtering low-budget listings, and drafting custom outreach pitches.
 
 **ClientRadar AI** turns this manual grind into an autonomous, 30-second pipeline:
 1. **Live Discovery & Deep-Linking**: Leverages **SerpApi's** `google_jobs` engine to harvest fresh, high-ticket tech contracts across LinkedIn, Indeed, ZipRecruiter, and company portals in real time with direct application deep-links.
 2. **Multi-Tier Viability & Risk Scoring**: Google's open-weight **Gemma 2** (`google/gemma-2-2b-it`) parses the job description, evaluates Scope Clarity (35 pts), Budget Alignment (35 pts), and Timeline Realism (30 pts), while auditing for scope-creep or equity-only red flags.
-3. **Custom Outreach Pitch Studio**: Gemma 2 crafts tailored proposals with selectable pitch strategies (*Direct Technical*, *Rapid MVP 48-Hour Kickoff*, or *Strategic Agency Retainer*) with 1-click Markdown download and clipboard copy.
-4. **Vercel/Linear-Grade Interface**: Designed with crisp inline SVG icons, KPI metrics bar, and dark-mode glassmorphic styling.
-
----
-
-## 🏆 Hackathon Challenge Target Categories
-- 🔍 **Best Use of SerpApi** ($100): Live extraction and JSON normalization of Google Jobs data with functional application deep-links.
-- 💎 **Best Use of Gemma** ($200): Open-weight intelligent lead evaluation, risk factor analysis, and tailored pitch generation.
-- 💸 **Open-Source AI Challenge: Side Hustle**: Real-world freelance lead arbitrage micro-SaaS with near-100% gross profit margins.
+3. **Custom Outreach Pitch Studio**: Gemma 2 crafts tailored proposals with selectable pitch strategies (*Direct Technical*, *Fast 48h Turnaround*, or *Strategic Retainer*) with 1-click Markdown download and clipboard copy.
+4. **Minimalist Developer Interface**: Designed with crisp inline SVG icons, KPI metrics bar, and Dark/Light mode appearance styling.
 
 ---
 
