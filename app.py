@@ -233,145 +233,26 @@ Output your answer strictly in this JSON format:
 # ==============================================================================
 def main():
     st.set_page_config(
-        page_title="ClientRadar — Freelance Lead Arbitrage",
+        page_title="ClientRadar | Freelance Lead Arbitrage",
         page_icon="🎯",
         layout="wide",
         initial_sidebar_state="expanded"
     )
 
-    # Sleek Minimalist Dark Styling
-    st.markdown("""
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        
-        html, body, [class*="css"] {
-            font-family: 'Inter', sans-serif;
-        }
-        
-        .stApp {
-            background-color: #0B0F19;
-            color: #F1F5F9;
-        }
-        
-        /* Minimalist Page Header */
-        .page-header {
-            margin-bottom: 22px;
-            padding-bottom: 14px;
-            border-bottom: 1px solid #1E293B;
-        }
-        
-        .page-title {
-            font-size: 1.55rem;
-            font-weight: 700;
-            color: #F8FAFC;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .page-subtitle {
-            font-size: 0.9rem;
-            color: #94A3B8;
-            margin-top: 4px;
-        }
-        
-        /* Metric Stats Strip */
-        .stats-strip {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        
-        .stat-card {
-            background: #111827;
-            border: 1px solid #1F2937;
-            border-radius: 10px;
-            padding: 12px 16px;
-        }
-        
-        .stat-label {
-            font-size: 0.76rem;
-            color: #94A3B8;
-            font-weight: 500;
-        }
-        
-        .stat-val {
-            font-size: 1.35rem;
-            font-weight: 700;
-            color: #F8FAFC;
-            margin-top: 2px;
-        }
-        
-        /* Chips */
-        .tag-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 3px 9px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            margin-right: 6px;
-            background: #1E293B;
-            color: #CBD5E1;
-            border: 1px solid #334155;
-        }
-        
-        /* Modern Primary Blue Button */
-        .stButton>button {
-            background: #2563EB !important;
-            color: #FFFFFF !important;
-            border: 1px solid #3B82F6 !important;
-            border-radius: 8px !important;
-            font-weight: 600 !important;
-            font-size: 0.88rem !important;
-            padding: 0.45rem 1rem !important;
-            transition: all 0.15s ease !important;
-        }
-        
-        .stButton>button:hover {
-            background: #1D4ED8 !important;
-            border-color: #60A5FA !important;
-        }
-        
-        /* Link button */
-        .stLinkButton>a {
-            background: #1E293B !important;
-            color: #93C5FD !important;
-            border: 1px solid #334155 !important;
-            border-radius: 8px !important;
-            font-size: 0.85rem !important;
-            font-weight: 500 !important;
-        }
-        
-        .stLinkButton>a:hover {
-            border-color: #3B82F6 !important;
-            color: #BFDBFE !important;
-        }
-        
-        /* Score Box */
-        .score-panel {
-            background: #111827;
-            border: 1px solid #1F2937;
-            border-left: 3px solid #10B981;
-            border-radius: 8px;
-            padding: 12px 16px;
-            margin: 12px 0;
-        }
-    </style>
-    """, unsafe_allow_html=True)
-
     env_serpapi = os.getenv("SERPAPI_API_KEY", "")
     env_hf = os.getenv("HUGGINGFACE_TOKEN", "")
 
     # ==========================================================================
-    # Sidebar: Clean Settings
+    # Sidebar: Theme Selector & Settings
     # ==========================================================================
     with st.sidebar:
-        st.markdown(f"### {svg_icon('radar', size=18, color='#3B82F6')} Settings", unsafe_allow_html=True)
-        st.caption("Add credentials for live search and AI evaluation. Leave blank to run in demo mode.")
+        st.markdown(f"### {svg_icon('radar', size=18, color='#3B82F6')} ClientRadar", unsafe_allow_html=True)
+        
+        # Theme Selector
+        theme_mode = st.radio("Theme Mode", ["Dark", "Light"], horizontal=True, label_visibility="collapsed")
+        is_dark = (theme_mode == "Dark")
+        
+        st.caption("Add API credentials for live discovery and AI evaluation. Leave blank to run in demo mode.")
         
         serpapi_key = st.text_input(
             "SerpApi Key",
@@ -414,11 +295,243 @@ def main():
             """)
         
         st.divider()
-        st.markdown(f'<a href="https://github.com/AshrafGalaxy/client-radar-ai" target="_blank" style="color: #94A3B8; font-size: 0.82rem; text-decoration: none;">{svg_icon("external", size=13)} GitHub Repository</a>', unsafe_allow_html=True)
+        st.markdown(f'<a href="https://github.com/AshrafGalaxy/client-radar-ai" target="_blank" style="color: {"#94A3B8" if is_dark else "#475569"}; font-size: 0.82rem; text-decoration: none;">{svg_icon("external", size=13)} GitHub Repository</a>', unsafe_allow_html=True)
 
-    # ==========================================================================
-    # Page Header (Single, Non-Redundant)
-    # ==========================================================================
+    # ==============================================================================
+    # Dynamic CSS Injection (Zero Blank Top Padding + Dark/Light Theme System)
+    # ==============================================================================
+    if is_dark:
+        theme_css = """
+        .stApp {
+            background-color: #0B0F19 !important;
+            color: #F1F5F9 !important;
+        }
+        .page-header {
+            border-bottom: 1px solid #1E293B !important;
+        }
+        .page-title {
+            color: #F8FAFC !important;
+        }
+        .page-subtitle {
+            color: #94A3B8 !important;
+        }
+        .stat-card {
+            background: #111827 !important;
+            border: 1px solid #1F2937 !important;
+        }
+        .stat-label {
+            color: #94A3B8 !important;
+        }
+        .stat-val {
+            color: #F8FAFC !important;
+        }
+        .tag-chip {
+            background: #1E293B !important;
+            color: #CBD5E1 !important;
+            border: 1px solid #334155 !important;
+        }
+        .score-panel {
+            background: #111827 !important;
+            border: 1px solid #1F2937 !important;
+            border-left: 3px solid #10B981 !important;
+        }
+        .stTextInput>div>div>input, .stSelectbox>div>div, .stTextArea>div>div>textarea {
+            background-color: #131C2E !important;
+            border: 1px solid #2A3854 !important;
+            color: #F1F5F9 !important;
+        }
+        .streamlit-expanderHeader {
+            background: #111827 !important;
+            border: 1px solid #1F2937 !important;
+            color: #F8FAFC !important;
+        }
+        .stLinkButton>a {
+            background: #1E293B !important;
+            color: #93C5FD !important;
+            border: 1px solid #334155 !important;
+        }
+        .stLinkButton>a:hover {
+            border-color: #3B82F6 !important;
+            color: #BFDBFE !important;
+        }
+        """
+    else: # Light Mode
+        theme_css = """
+        .stApp {
+            background-color: #F8FAFC !important;
+            color: #0F172A !important;
+        }
+        .page-header {
+            border-bottom: 1px solid #E2E8F0 !important;
+        }
+        .page-title {
+            color: #0F172A !important;
+        }
+        .page-subtitle {
+            color: #64748B !important;
+        }
+        .stat-card {
+            background: #FFFFFF !important;
+            border: 1px solid #E2E8F0 !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+        }
+        .stat-label {
+            color: #64748B !important;
+        }
+        .stat-val {
+            color: #0F172A !important;
+        }
+        .tag-chip {
+            background: #F1F5F9 !important;
+            color: #334155 !important;
+            border: 1px solid #E2E8F0 !important;
+        }
+        .score-panel {
+            background: #F0FDF4 !important;
+            border: 1px solid #DCFCE7 !important;
+            border-left: 3px solid #16A34A !important;
+        }
+        .stTextInput>div>div>input, .stSelectbox>div>div, .stTextArea>div>div>textarea {
+            background-color: #FFFFFF !important;
+            border: 1px solid #CBD5E1 !important;
+            color: #0F172A !important;
+        }
+        .streamlit-expanderHeader {
+            background: #FFFFFF !important;
+            border: 1px solid #E2E8F0 !important;
+            color: #0F172A !important;
+        }
+        .stLinkButton>a {
+            background: #F1F5F9 !important;
+            color: #2563EB !important;
+            border: 1px solid #CBD5E1 !important;
+        }
+        .stLinkButton>a:hover {
+            border-color: #2563EB !important;
+            color: #1D4ED8 !important;
+        }
+        """
+
+    st.markdown(f"""
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        html, body, [class*="css"] {{
+            font-family: 'Inter', sans-serif;
+        }}
+        
+        /* Eliminate top blank space */
+        .block-container {{
+            padding-top: 1.2rem !important;
+            padding-bottom: 2rem !important;
+            max-width: 1100px !important;
+        }}
+        
+        [data-testid="stSidebarContent"] {{
+            padding-top: 1.2rem !important;
+        }}
+        
+        header[data-testid="stHeader"] {{
+            display: none !important;
+        }}
+        
+        /* Minimalist Page Header */
+        .page-header {{
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+        }}
+        
+        .page-title {{
+            font-size: 1.55rem;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }}
+        
+        .page-subtitle {{
+            font-size: 0.9rem;
+            margin-top: 3px;
+        }}
+        
+        /* Metric Stats Strip */
+        .stats-strip {{
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }}
+        
+        .stat-card {{
+            border-radius: 10px;
+            padding: 12px 16px;
+        }}
+        
+        .stat-label {{
+            font-size: 0.76rem;
+            font-weight: 500;
+        }}
+        
+        .stat-val {{
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-top: 2px;
+        }}
+        
+        /* Chips */
+        .tag-chip {{
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 9px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-right: 6px;
+        }}
+        
+        /* Modern Primary Blue Button */
+        .stButton>button {{
+            background: #2563EB !important;
+            color: #FFFFFF !important;
+            border: 1px solid #3B82F6 !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            font-size: 0.88rem !important;
+            padding: 0.45rem 1rem !important;
+            transition: all 0.15s ease !important;
+        }}
+        
+        .stButton>button:hover {{
+            background: #1D4ED8 !important;
+            border-color: #60A5FA !important;
+        }}
+        
+        /* Inputs */
+        .stTextInput>div>div>input, .stSelectbox>div>div, .stTextArea>div>div>textarea {{
+            border-radius: 8px !important;
+        }}
+        
+        .streamlit-expanderHeader {{
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+        }}
+        
+        .stLinkButton>a {{
+            border-radius: 8px !important;
+            font-size: 0.85rem !important;
+            font-weight: 500 !important;
+        }}
+        
+        /* Theme Variables */
+        {theme_css}
+    </style>
+    """, unsafe_allow_html=True)
+
+    # ==============================================================================
+    # Page Header (Single, Zero Top Gap)
+    # ==============================================================================
     st.markdown("""
     <div class="page-header">
         <h1 class="page-title">ClientRadar</h1>
@@ -426,9 +539,9 @@ def main():
     </div>
     """, unsafe_allow_html=True)
 
-    # ==========================================================================
+    # ==============================================================================
     # Search Toolbar
-    # ==========================================================================
+    # ==============================================================================
     with st.container():
         c_q, c_loc, c_num = st.columns([3, 1.8, 1])
         with c_q:
@@ -447,9 +560,9 @@ def main():
             leads = fetch_leads_serpapi(query, location, serpapi_key, max_results=max_results)
             st.session_state["discovered_leads"] = leads
 
-    # ==========================================================================
+    # ==============================================================================
     # Compact Metrics Strip
-    # ==========================================================================
+    # ==============================================================================
     current_leads = st.session_state.get("discovered_leads", [])
     
     st.markdown(f"""
@@ -469,9 +582,9 @@ def main():
     </div>
     """, unsafe_allow_html=True)
 
-    # ==========================================================================
+    # ==============================================================================
     # Contract Opportunities List
-    # ==========================================================================
+    # ==============================================================================
     st.markdown(f"##### Contract Opportunities ({len(current_leads)})")
 
     for i, lead in enumerate(current_leads):
@@ -532,7 +645,7 @@ def main():
                             </div>
                             <div style="font-size: 0.8rem; color: #94A3B8;">Gemma 2 Analysis</div>
                         </div>
-                        <div style="font-size: 0.85rem; color: #CBD5E1; margin-top: 6px;">
+                        <div style="font-size: 0.85rem; margin-top: 6px;">
                             <strong>Scope Clarity:</strong> {res.get('scope_clarity', 'Clear contractor scope.')}
                         </div>
                         <div style="font-size: 0.85rem; color: #94A3B8; margin-top: 3px;">
