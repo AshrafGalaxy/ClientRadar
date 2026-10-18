@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import urllib.parse
 import requests
@@ -52,50 +53,272 @@ MOCK_LEADS = [
     {
         "title": "Senior Python Backend Architect (Contract)",
         "company_name": "Aether Dynamics",
-        "location": "Remote",
+        "location": "Remote (Worldwide / WFH)",
         "via": "LinkedIn",
-        "budget": "$5,000 / month",
+        "budget": "$95 – $140 / hr",
+        "budget_val": 118,
         "posted": "2 days ago",
         "description": "Seeking an experienced backend contractor to optimize distributed data ingestion workers. Requires FastAPI, Redis, and PostgreSQL experience. Estimated 20 hrs/week. Deliverables include auditing Celery task latency, schema isolation, and comprehensive pytest harnesses.",
-        "link": build_google_jobs_deeplink("Senior Python Backend Architect FastAPI", "Aether Dynamics", "Remote")
+        "link": build_google_jobs_deeplink("Senior Python Backend Architect FastAPI", "Aether Dynamics", "Remote"),
+        "apply_options": [
+            {"title": "LinkedIn", "link": build_google_jobs_deeplink("Senior Python Backend Architect FastAPI", "Aether Dynamics", "Remote")},
+            {"title": "ZipRecruiter", "link": build_google_jobs_deeplink("Senior Python Backend Architect", "Aether Dynamics", "Remote")}
+        ],
+        "viability": {
+            "score": 94,
+            "scope_clarity": "High technical clarity; clear demand for FastAPI, Redis, PostgreSQL expertise with concrete deliverables.",
+            "red_flags": "None detected — direct contract alignment and transparent scope.",
+            "market_demand": "High Priority Lead"
+        }
     },
     {
         "title": "Full-Stack Automation & Scraper Engineer",
         "company_name": "Vanguard Lead Labs",
-        "location": "Remote",
+        "location": "San Francisco, CA (Remote-Friendly)",
         "via": "ZipRecruiter",
-        "budget": "Fixed: $2,500",
+        "budget": "$75 – $110 / hr",
+        "budget_val": 92,
         "posted": "1 day ago",
         "description": "Need an engineer to build resilient web scrapers and lead enrichment workflows. Experience with Playwright/Selenium, anti-bot bypass strategies, and persisting clean JSON schemas into Supabase.",
-        "link": build_google_jobs_deeplink("Full-Stack Web Scraper Automation Engineer", "Vanguard Lead Labs", "Remote")
+        "link": build_google_jobs_deeplink("Full-Stack Web Scraper Automation Engineer", "Vanguard Lead Labs", "Remote"),
+        "apply_options": [
+            {"title": "ZipRecruiter", "link": build_google_jobs_deeplink("Full-Stack Web Scraper Automation Engineer", "Vanguard Lead Labs", "Remote")}
+        ],
+        "viability": {
+            "score": 91,
+            "scope_clarity": "High technical clarity; clear demand for Playwright, Python, Supabase scraping pipelines.",
+            "red_flags": "None detected — direct contract alignment and transparent scope.",
+            "market_demand": "High Priority Lead"
+        }
     },
     {
         "title": "AI Integration & LangChain Developer (Freelance)",
         "company_name": "Kroma Media",
-        "location": "Remote",
+        "location": "New York, NY (Remote-Friendly)",
         "via": "Indeed",
-        "budget": "$85 / hour",
+        "budget": "$85 – $130 / hr",
+        "budget_val": 108,
         "posted": "3 days ago",
         "description": "Contractor needed to hook open-source LLMs (Gemma, Llama) into customer support ticketing workflows via LangChain. Fast-turnaround project with potential for monthly maintenance retainer.",
-        "link": build_google_jobs_deeplink("AI Integration LangChain Developer", "Kroma Media", "Remote")
+        "link": build_google_jobs_deeplink("AI Integration LangChain Developer", "Kroma Media", "Remote"),
+        "apply_options": [
+            {"title": "Indeed", "link": build_google_jobs_deeplink("AI Integration LangChain Developer", "Kroma Media", "Remote")},
+            {"title": "LinkedIn", "link": build_google_jobs_deeplink("AI Integration LangChain Developer", "Kroma Media", "Remote")}
+        ],
+        "viability": {
+            "score": 89,
+            "scope_clarity": "Clear demand for LLM integration, Gemma, and LangChain orchestration with milestone-based delivery.",
+            "red_flags": "None detected — direct contract alignment and transparent scope.",
+            "market_demand": "High Priority Lead"
+        }
     },
     {
         "title": "FastAPI & Microservices Specialist",
         "company_name": "CloudNova Systems",
-        "location": "Remote",
+        "location": "Remote (Worldwide / Anywhere)",
         "via": "Google Jobs",
-        "budget": "$95 / hour",
+        "budget": "$90 – $135 / hr",
+        "budget_val": 112,
         "posted": "4 days ago",
         "description": "Immediate requirement for a senior engineer to audit async API bottlenecks, reduce p99 latency under load, and implement clean Dockerized test harnesses. 6-week engagement.",
-        "link": build_google_jobs_deeplink("FastAPI Microservices Optimization", "CloudNova Systems", "Remote")
+        "link": build_google_jobs_deeplink("FastAPI Microservices Optimization", "CloudNova Systems", "Remote"),
+        "apply_options": [
+            {"title": "Google Jobs", "link": build_google_jobs_deeplink("FastAPI Microservices Optimization", "CloudNova Systems", "Remote")}
+        ],
+        "viability": {
+            "score": 93,
+            "scope_clarity": "High technical clarity; clear demand for FastAPI, Microservices, Docker performance tuning.",
+            "red_flags": "None detected — direct contract alignment and transparent scope.",
+            "market_demand": "High Priority Lead"
+        }
     }
 ]
+
+# ==============================================================================
+# Dynamic Extraction & Viability Helpers
+# ==============================================================================
+def parse_compensation(extensions: list, detected: dict, desc: str, title: str) -> tuple[str, int]:
+    """Extracts realistic compensation and representative numeric hourly rate from real job data."""
+    # 1. Check detected extensions if available
+    det_salary = detected.get("salary") if isinstance(detected, dict) else None
+    if det_salary:
+        match = re.search(r'(\d+[\d,.]*)\s*[\u2013\u2014\-\sto]+\s*(\d+[\d,.]*)', det_salary)
+        if match:
+            low = float(match.group(1).replace(',', ''))
+            high = float(match.group(2).replace(',', ''))
+            avg = int((low + high) / 2)
+            if 'year' in det_salary.lower() or 'yr' in det_salary.lower() or low > 1000:
+                hourly_eqv = int(avg / 2000)
+                return f"{det_salary} (~${hourly_eqv}/hr)", hourly_eqv
+            return f"${int(low)} – ${int(high)} / hr", avg
+        return det_salary, 100
+
+    # 2. Check raw extensions list
+    for ext in extensions:
+        clean = ext.lower()
+        if any(kw in clean for kw in ["hour", "an hour", "/hr", "a year", "/yr", "month", "$"]):
+            if "hour" in clean or "/hr" in clean:
+                match = re.search(r'(\d+[\d,.]*)\s*[\u2013\u2014\-\sto]+\s*(\d+[\d,.]*)', ext)
+                if match:
+                    low = float(match.group(1).replace(',', ''))
+                    high = float(match.group(2).replace(',', ''))
+                    return f"${int(low)} – ${int(high)} / hr", int((low + high) / 2)
+                single_match = re.search(r'(\d+[\d,.]*)', ext)
+                if single_match:
+                    val = int(float(single_match.group(1).replace(',', '')))
+                    return f"${val} / hr", val
+            elif "year" in clean or "/yr" in clean:
+                match = re.search(r'(\d+[\d,.]*)\s*[\u2013\u2014\-\sto]+\s*(\d+[\d,.]*)', ext)
+                if match:
+                    low = float(match.group(1).replace(',', ''))
+                    high = float(match.group(2).replace(',', ''))
+                    avg_yr = (low + high) / 2
+                    hourly_eqv = int(avg_yr / 2000)
+                    return f"${int(low):,} – ${int(high):,} / yr (~${hourly_eqv}/hr)", hourly_eqv
+            return ext.replace("\ufffd", "–"), 95
+
+    # 3. Check description regex
+    desc_match = re.search(r'(\$\d+[\d,.]*\s*(?:[\u2013\u2014\-\sto]+\s*\$\d+[\d,.]*)?\s*(?:per|\/)?\s*(?:hr|hour))', desc, re.I)
+    if desc_match:
+        found_str = desc_match.group(1)
+        nums = [float(n.replace(',', '')) for n in re.findall(r'\d+[\d,.]*', found_str)]
+        avg = int(sum(nums) / len(nums)) if nums else 95
+        return found_str, avg
+
+    # 4. Realistic market estimate based on technical specialization
+    combined = (title + " " + desc).lower()
+    if any(k in combined for k in ["architect", "lead", "principal", "staff", "ai trainer", "llm", "distributed"]):
+        return "$120 – $180 / hr (Est. Market Rate)", 150
+    elif any(k in combined for k in ["backend", "python", "fastapi", "microservices", "cloud", "devops"]):
+        return "$85 – $140 / hr (Est. Market Rate)", 112
+    elif any(k in combined for k in ["full-stack", "full stack", "react", "frontend", "automation", "scraper"]):
+        return "$75 – $120 / hr (Est. Market Rate)", 98
+    else:
+        return "$70 – $115 / hr (Est. Market Rate)", 92
+
+def parse_recency(extensions: list, detected: dict, desc: str) -> str:
+    """Parses real posting recency (e.g. '3 days ago', '16 hours ago')."""
+    if isinstance(detected, dict) and detected.get("posted_at"):
+        return detected["posted_at"]
+    
+    for ext in extensions:
+        clean = ext.strip()
+        if re.search(r'\b(?:\d+\s+(?:minute|hour|day|week|month)s?\s+ago|just now|today|yesterday)\b', clean, re.I):
+            return clean
+            
+    m = re.search(r'\b(posted\s+\d+\s+(?:day|hour)s?\s+ago)\b', desc, re.I)
+    if m:
+        return m.group(1).title()
+        
+    return "Recently posted"
+
+def parse_location(raw_loc: str, extensions: list, apply_options: list) -> str:
+    """Accurately parses location, identifying WFH/Remote vs regional office requirements."""
+    exts_str = " ".join(extensions).lower()
+    is_wfh = "work from home" in exts_str or "remote" in exts_str
+    
+    city_hint = ""
+    for opt in apply_options:
+        link = opt.get("link", "")
+        m = re.search(r'-in-([A-Za-z\-]+,[A-Za-z]+)', link)
+        if m:
+            city_hint = m.group(1).replace("-", " ")
+            break
+            
+    if not raw_loc or raw_loc.strip().lower() in ["anywhere", "remote"]:
+        if city_hint:
+            return f"{city_hint} (Remote / WFH)"
+        elif is_wfh:
+            return "Remote (Worldwide / WFH)"
+        return "Remote (Worldwide / Anywhere)"
+    else:
+        clean_loc = raw_loc.strip()
+        if is_wfh and "remote" not in clean_loc.lower():
+            return f"{clean_loc} (Remote-Friendly)"
+        return clean_loc
+
+def calculate_lead_viability(lead_data: dict) -> dict:
+    """Calculates dynamic viability score, scope clarity, and risk audit for any opportunity."""
+    title = lead_data.get("title", "")
+    desc = lead_data.get("description", "")
+    exts = lead_data.get("extensions", [])
+    loc = lead_data.get("location", "")
+    budget_val = lead_data.get("budget_val", 0)
+    
+    combined_text = (title + " " + desc + " " + " ".join(exts)).lower()
+    score = 78
+    
+    # Rate clarity
+    if budget_val and budget_val > 0:
+        if budget_val >= 120:
+            score += 10
+        elif budget_val >= 75:
+            score += 7
+        else:
+            score += 4
+    elif any(k in combined_text for k in ["$", "hour", "an hour", "/hr"]):
+        score += 6
+    else:
+        score += 1
+        
+    # Remote clarity
+    if any(k in combined_text for k in ["work from home", "remote", "anywhere", "worldwide"]):
+        score += 6
+        
+    # Contractor / 1099 terms
+    if any(k in combined_text for k in ["contractor", "part-time", "contract", "freelance"]):
+        score += 5
+    elif "full-time" in combined_text:
+        score -= 3
+        
+    # Description depth
+    if len(desc) > 300:
+        score += 4
+    elif len(desc) < 120:
+        score -= 4
+        
+    # Recency
+    if any(k in combined_text for k in ["1 day", "2 day", "3 day", "today", "yesterday", "hours ago"]):
+        score += 4
+    elif any(k in combined_text for k in ["14 day", "15 day", "16 day", "month ago", "30+ days"]):
+        score -= 3
+        
+    final_score = max(68, min(97, score))
+    
+    # Scope clarity assessment
+    tech_keywords = [
+        "Python", "FastAPI", "API", "Async", "Redis", "PostgreSQL", "Docker", "AWS",
+        "LangChain", "LLM", "Machine Learning", "Microservices", "Playwright", "Scraping",
+        "Data Pipeline", "Distributed Systems", "SQL", "React", "TypeScript"
+    ]
+    detected_tech = [t for t in tech_keywords if t.lower() in combined_text]
+    if detected_tech:
+        scope_clarity = f"High technical clarity; clear demand for {', '.join(detected_tech[:3])} expertise with concrete deliverables."
+    else:
+        scope_clarity = f"Defined scope centered on {title}; milestones verifiable during initial technical discovery."
+        
+    # Risk audit
+    if "full-time" in combined_text and not any(k in combined_text for k in ["contractor", "contract"]):
+        red_flags = "Role tagged as Full-time; recommend positioning outreach as specialized 1099 B2B advisory contract."
+    elif not budget_val or budget_val <= 0:
+        red_flags = "Compensation rate unstated in brief; anchor at target contractor rate during discovery call."
+    elif any(k in combined_text for k in ["14 day", "15 day", "16 day", "month ago"]):
+        red_flags = "Posting is over 2 weeks old; verify active candidate review during initial outreach."
+    else:
+        red_flags = "None detected — direct contract alignment and transparent scope."
+        
+    return {
+        "score": final_score,
+        "scope_clarity": scope_clarity,
+        "red_flags": red_flags,
+        "market_demand": "High Priority Lead" if final_score >= 88 else "Standard Contract"
+    }
 
 # ==============================================================================
 # SerpApi Harvesting
 # ==============================================================================
 def fetch_leads_serpapi(search_term: str, search_loc: str, api_key: str, max_results: int = 4):
-    """Fetches real-time jobs via SerpApi's google_jobs engine with working deep-links."""
+    """Fetches real-time jobs via SerpApi's google_jobs engine with working deep-links and dynamic parsing."""
     if not api_key:
         return MOCK_LEADS[:max_results]
     
@@ -115,31 +338,57 @@ def fetch_leads_serpapi(search_term: str, search_loc: str, api_key: str, max_res
             for item in data.get("jobs_results", [])[:max_results]:
                 title = item.get("title", "Contract Opportunity")
                 company = item.get("company_name", "Confidential")
-                loc = item.get("location", search_loc)
+                raw_loc = item.get("location", search_loc)
                 desc = item.get("description", "No description provided.")
-                via = item.get("via", "Direct").replace("via ", "")
+                via_raw = item.get("via", "Direct").replace("via ", "").strip()
                 
-                extensions = item.get("detected_extensions", {})
-                posted_time = extensions.get("posted_at", "Recently")
-                salary = extensions.get("salary", "Competitive Contract Rate")
+                # Extensions list and detected extensions
+                extensions_list = item.get("extensions") or []
+                detected_dict = item.get("detected_extensions") or {}
+                apply_opts = item.get("apply_options") or []
                 
-                # Direct link priority: share_link -> first apply_option -> dynamic google jobs link
-                apply_opts = item.get("apply_options", [])
-                primary_link = item.get("share_link")
-                if not primary_link and apply_opts:
-                    primary_link = apply_opts[0].get("link")
-                if not primary_link:
-                    primary_link = build_google_jobs_deeplink(title, company, loc)
+                # Dynamic parsing
+                budget_str, budget_val = parse_compensation(extensions_list, detected_dict, desc, title)
+                posted_time = parse_recency(extensions_list, detected_dict, desc)
+                formatted_loc = parse_location(raw_loc, extensions_list, apply_opts)
+                
+                # Determine primary platform
+                primary_platform = via_raw
+                if apply_opts and apply_opts[0].get("title"):
+                    primary_platform = apply_opts[0]["title"]
+                
+                # Direct link priority: first apply option -> share_link -> dynamic google jobs link
+                primary_link = None
+                if apply_opts and apply_opts[0].get("link"):
+                    primary_link = apply_opts[0]["link"]
+                elif item.get("share_link"):
+                    primary_link = item.get("share_link")
+                else:
+                    primary_link = build_google_jobs_deeplink(title, company, raw_loc)
+                
+                # Compute dynamic viability for this specific opportunity
+                lead_data_stub = {
+                    "title": title,
+                    "company_name": company,
+                    "description": desc,
+                    "extensions": extensions_list,
+                    "location": formatted_loc,
+                    "budget_val": budget_val
+                }
+                viability = calculate_lead_viability(lead_data_stub)
                 
                 jobs.append({
                     "title": title,
                     "company_name": company,
-                    "location": loc,
-                    "via": via,
-                    "budget": salary,
+                    "location": formatted_loc,
+                    "via": primary_platform,
+                    "budget": budget_str,
+                    "budget_val": budget_val,
                     "posted": posted_time,
                     "description": desc[:600] + ("..." if len(desc) > 600 else ""),
-                    "link": primary_link
+                    "link": primary_link,
+                    "apply_options": apply_opts,
+                    "viability": viability
                 })
             return jobs if jobs else MOCK_LEADS[:max_results]
         elif response.status_code == 401:
@@ -153,49 +402,78 @@ def fetch_leads_serpapi(search_term: str, search_loc: str, api_key: str, max_res
 # ==============================================================================
 # Gemma 2 Proposal Generator
 # ==============================================================================
-def generate_tailored_pitch(lead_info: dict, pitch_tone: str = "Direct Technical") -> dict:
-    """High-precision proposal and viability evaluation synthesis."""
+def generate_tailored_pitch(lead_info: dict, pitch_tone: str = "Direct Technical", consultant_profile: dict = None) -> dict:
+    """High-precision proposal and viability evaluation synthesis customized to consultant profile."""
+    if not consultant_profile:
+        consultant_profile = {
+            "name": "Ashraf",
+            "title": "Independent Technical Consultant",
+            "rate": "$95 – $140 / hr",
+            "portfolio": "https://github.com/AshrafGalaxy",
+            "skills": "Python, FastAPI, Redis, Distributed Systems"
+        }
+        
+    c_name = consultant_profile.get("name", "Ashraf")
+    c_title = consultant_profile.get("title", "Independent Technical Consultant")
+    c_rate = consultant_profile.get("rate", "$95 – $140 / hr")
+    c_portfolio = consultant_profile.get("portfolio", "https://github.com/AshrafGalaxy")
+    c_skills = consultant_profile.get("skills", "Python, FastAPI, Distributed Systems")
+    
+    viability = lead_info.get("viability") or calculate_lead_viability(lead_info)
+    
     if pitch_tone == "Fast 48h Turnaround":
-        approach = "1. **Sprint 0 Scaffolding (Day 1-2):** Stand up the core pipeline skeleton with unit test coverage.\n2. **Iterative Feature Deployment:** Deliver clean, validated modules with continuous delivery notes."
+        approach = f"1. **Rapid Milestone Scaffolding (Days 1–2):** Stand up the core {lead_info['title']} pipeline with unit testing and CI verification.\n2. **Iterative Sprint Deployment:** Deliver modular, validated milestones within 48-hour turnarounds with continuous delivery notes."
     elif pitch_tone == "Strategic Retainer":
-        approach = "1. **Architecture & Latency Audit:** Identify bottleneck queries and establish strict schema validation.\n2. **Production-Ready Delivery:** Deliver maintainable, documented services with long-term SLA support."
+        approach = f"1. **Architecture & Latency Audit:** Audit system bottlenecks, establish strict schema validation, and optimize {lead_info['title']} throughput.\n2. **Long-Term Scaling & SLA Support:** Provide dedicated ongoing capacity, automated health telemetry, and SLA-backed architectural guidance."
     else: # Direct Technical
-        approach = "1. **System Audit & Bottleneck Remediation:** Establish strict schema validation and error isolation patterns within the first 48 hours.\n2. **Production Delivery:** Deliver maintainable, unit-tested pipeline code with complete logging and telemetry."
+        approach = f"1. **System Audit & Bottleneck Remediation:** Establish strict schema validation, error isolation, and async worker optimizations within the initial sprint.\n2. **Production-Ready Delivery:** Deliver maintainable, unit-tested pipeline code with complete logging, telemetry, and automated deployment scripts."
 
     return {
-        "score": 94,
-        "scope_clarity": "Well-defined technical stack and specific deliverable milestones.",
-        "red_flags": "None detected",
+        "score": viability.get("score", 92),
+        "scope_clarity": viability.get("scope_clarity", "Well-defined technical stack and specific deliverable milestones."),
+        "red_flags": viability.get("red_flags", "None detected"),
         "subject": f"Technical Approach: {lead_info['title']}",
         "pitch": f"""Hi {lead_info['company_name']} Hiring Team,
 
 I came across your opening for the **{lead_info['title']}** and wanted to reach out directly regarding your technical requirements.
 
-Having built resilient backend services and distributed pipelines handling asynchronous workloads, I can step in immediately without onboarding friction.
+With specialized experience building high-throughput backend services and distributed pipelines ({c_skills}), I can step in immediately without onboarding friction.
 
 **Proposed Technical Approach:**
 {approach}
 
+**Commercials & Availability:**
+Available for immediate engagement at **{c_rate}** with flexible milestone or hourly billing.
+
 Would you be open to a brief 10-minute technical sync this week to review your milestone goals?
 
 Best regards,  
-Ashraf  
-*Independent Technical Consultant*"""
+{c_name}  
+*{c_title}*  
+Portfolio: [{c_portfolio}]({c_portfolio})"""
     }
 
-def evaluate_and_pitch_with_gemma(lead_info: dict, token: str, pitch_tone: str = "Direct Technical"):
+def evaluate_and_pitch_with_gemma(lead_info: dict, token: str, pitch_tone: str = "Direct Technical", consultant_profile: dict = None):
     """Generates structured viability score and tailored proposal using Gemma 2 with resilient fallback."""
     if not token:
-        return generate_tailored_pitch(lead_info, pitch_tone)
+        return generate_tailored_pitch(lead_info, pitch_tone, consultant_profile)
+
+    c_name = consultant_profile.get("name", "Ashraf") if consultant_profile else "Ashraf"
+    c_title = consultant_profile.get("title", "Technical Consultant") if consultant_profile else "Technical Consultant"
+    c_rate = consultant_profile.get("rate", "$95 - $140 / hr") if consultant_profile else "$95 - $140 / hr"
+    c_portfolio = consultant_profile.get("portfolio", "https://github.com/AshrafGalaxy") if consultant_profile else "https://github.com/AshrafGalaxy"
+    c_skills = consultant_profile.get("skills", "Python, FastAPI, Distributed Systems") if consultant_profile else "Python, FastAPI, Distributed Systems"
 
     # Live Inference via Hugging Face router
     api_url = "https://router.huggingface.co/v1/chat/completions"
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
-    prompt = f"""Analyze this freelance contract opportunity and generate a structured evaluation and bespoke proposal in the tone '{pitch_tone}':
+    prompt = f"""Analyze this freelance contract opportunity and generate a structured evaluation and bespoke proposal in the tone '{pitch_tone}' from consultant {c_name} ({c_title}, rate: {c_rate}, portfolio: {c_portfolio}, specialties: {c_skills}):
 
 Role: {lead_info['title']}
 Company: {lead_info['company_name']}
 Description: {lead_info['description']}
+Location: {lead_info['location']}
+Rate: {lead_info['budget']}
 
 Output your answer strictly in this JSON format:
 {{
@@ -203,7 +481,7 @@ Output your answer strictly in this JSON format:
   "scope_clarity": "<one sentence summarizing scope clarity>",
   "red_flags": "<any red flags or 'None detected'>",
   "subject": "<compelling email subject>",
-  "pitch": "<concise 3-paragraph outreach email addressing requirements and asking for a brief sync>"
+  "pitch": "<concise 3-paragraph outreach email addressing requirements, mentioning commercials and portfolio, signed by {c_name}>"
 }}"""
 
     payload = {
@@ -226,17 +504,18 @@ Output your answer strictly in this JSON format:
                 try:
                     return json.loads(clean)
                 except Exception:
+                    viability = lead_info.get("viability") or calculate_lead_viability(lead_info)
                     return {
-                        "score": 90,
-                        "scope_clarity": "Evaluated by Gemma 2.",
-                        "red_flags": "None detected",
+                        "score": viability.get("score", 90),
+                        "scope_clarity": viability.get("scope_clarity", "Evaluated by Gemma 2."),
+                        "red_flags": viability.get("red_flags", "None detected"),
                         "subject": f"Technical Approach: {lead_info['title']}",
                         "pitch": raw_text
                     }
         # If router returns 402 (provider credits required) or model spinning up, fallback to tailored pitch
-        return generate_tailored_pitch(lead_info, pitch_tone)
+        return generate_tailored_pitch(lead_info, pitch_tone, consultant_profile)
     except Exception:
-        return generate_tailored_pitch(lead_info, pitch_tone)
+        return generate_tailored_pitch(lead_info, pitch_tone, consultant_profile)
 
 # ==============================================================================
 # UI Application
@@ -300,8 +579,21 @@ def main():
             if override_hf:
                 hf_token = override_hf
 
-
-        
+        with st.expander("🧑‍💻 Freelancer Profile (Personalize)", expanded=False):
+            st.caption("Personalizes pitch signatures, rates, and positioning:")
+            p_name = st.text_input("Consultant Name", value="Ashraf", key="profile_name")
+            p_title = st.text_input("Professional Title", value="Senior Backend & Distributed Systems Consultant", key="profile_title")
+            p_rate = st.text_input("Target Rate / Terms", value="$95 – $140 / hr", key="profile_rate")
+            p_portfolio = st.text_input("Portfolio / GitHub URL", value="https://github.com/AshrafGalaxy", key="profile_portfolio")
+            p_skills = st.text_input("Core Specialties", value="Python, FastAPI, Redis, Docker, Distributed Pipelines", key="profile_skills")
+            
+        consultant_profile = {
+            "name": p_name,
+            "title": p_title,
+            "rate": p_rate,
+            "portfolio": p_portfolio,
+            "skills": p_skills
+        }
         st.divider()
         st.markdown(f'<a href="https://github.com/AshrafGalaxy/ClientRadar" target="_blank" style="color: {"#94A3B8" if is_dark else "#475569"}; font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">{svg_icon("github", size=14, color="currentColor")} AshrafGalaxy/ClientRadar</a>', unsafe_allow_html=True)
 
@@ -1050,6 +1342,26 @@ def main():
     # ==============================================================================
     current_leads = st.session_state.get("discovered_leads", [])
     
+    # Dynamically compute metrics from current opportunities
+    if current_leads:
+        scores = [l.get("viability", {}).get("score", 90) for l in current_leads]
+        avg_viability = round(sum(scores) / len(scores))
+        rates = [l.get("budget_val") for l in current_leads if l.get("budget_val")]
+        if rates:
+            min_r = min(rates)
+            max_r = max(rates)
+            if min_r == max_r:
+                comp_display = f"${min_r} <span style='font-size: 0.8rem; color: #94A3B8;'>/hr avg</span>"
+            else:
+                comp_display = f"${min_r} – ${max_r} <span style='font-size: 0.8rem; color: #94A3B8;'>/hr</span>"
+        else:
+            comp_display = "$95 – $140 <span style='font-size: 0.8rem; color: #94A3B8;'>/hr</span>"
+    else:
+        avg_viability = 0
+        comp_display = "—"
+        
+    viability_color = "#10B981" if avg_viability >= 85 else ("#F59E0B" if avg_viability >= 75 else "#EF4444")
+    
     st.markdown(f"""
     <div class="stats-strip">
         <div class="stat-card">
@@ -1058,11 +1370,11 @@ def main():
         </div>
         <div class="stat-card">
             <div class="stat-label">Avg Viability</div>
-            <div class="stat-val" style="color: #10B981;">94%</div>
+            <div class="stat-val" style="color: {viability_color};">{avg_viability}%</div>
         </div>
         <div class="stat-card">
             <div class="stat-label">Est. Compensation</div>
-            <div class="stat-val" style="color: #F59E0B;">$4,800 <span style="font-size: 0.8rem; color: #94A3B8;">/mo</span></div>
+            <div class="stat-val" style="color: #F59E0B;">{comp_display}</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -1092,12 +1404,60 @@ def main():
                 
             with c_actions:
                 st.markdown("**Actions**")
-                # Direct working Google Jobs / provider link
-                st.link_button(
-                    label=f"View on {lead['via']} ↗",
-                    url=lead["link"],
-                    use_container_width=True
-                )
+                
+                # Accurately display where the contract opportunity is posted
+                apply_opts = lead.get("apply_options", [])
+                platforms = [opt.get("title") for opt in apply_opts if opt.get("title")]
+                if not platforms and lead.get("via"):
+                    platforms = [lead["via"]]
+                
+                unique_platforms = []
+                for p in platforms:
+                    if p and p not in unique_platforms:
+                        unique_platforms.append(p)
+                        
+                posted_platforms_str = " · ".join(unique_platforms[:3]) if unique_platforms else lead.get("via", "Direct")
+                
+                st.markdown(f"""
+                <div style="font-size: 0.82rem; margin-bottom: 8px; line-height: 1.4;">
+                    <span style="color: {'#94A3B8' if is_dark else '#64748B'};">Posted on:</span>
+                    <strong style="color: {'#F8FAFC' if is_dark else '#0F172A'};"> {posted_platforms_str}</strong>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                # Dynamic platform-specific action buttons
+                linkedin_opt = next((opt for opt in apply_opts if "linkedin" in opt.get("title", "").lower()), None)
+                primary_opt = apply_opts[0] if apply_opts else None
+                
+                if linkedin_opt and primary_opt and linkedin_opt != primary_opt:
+                    st.link_button(
+                        label=f"Apply on {primary_opt.get('title', 'Portal')} ↗",
+                        url=primary_opt.get("link", lead["link"]),
+                        use_container_width=True
+                    )
+                    st.link_button(
+                        label="Apply on LinkedIn ↗",
+                        url=linkedin_opt.get("link", lead["link"]),
+                        use_container_width=True
+                    )
+                elif linkedin_opt:
+                    st.link_button(
+                        label="Apply on LinkedIn ↗",
+                        url=linkedin_opt.get("link", lead["link"]),
+                        use_container_width=True
+                    )
+                elif primary_opt:
+                    st.link_button(
+                        label=f"Apply on {primary_opt.get('title', lead.get('via', 'Portal'))} ↗",
+                        url=primary_opt.get("link", lead["link"]),
+                        use_container_width=True
+                    )
+                else:
+                    st.link_button(
+                        label=f"Apply on {lead.get('via', 'Portal')} ↗",
+                        url=lead["link"],
+                        use_container_width=True
+                    )
                 
                 tone = st.selectbox(
                     "Pitch Style:",
@@ -1107,7 +1467,7 @@ def main():
                 
                 if st.button("Generate Pitch", key=f"gen_{i}", use_container_width=True):
                     with st.spinner("Analyzing brief with Gemma 2..."):
-                        res = evaluate_and_pitch_with_gemma(lead, hf_token, pitch_tone=tone)
+                        res = evaluate_and_pitch_with_gemma(lead, hf_token, pitch_tone=tone, consultant_profile=consultant_profile)
                         st.session_state[f"pitch_{i}"] = res
 
             # Render Generated Proposal
