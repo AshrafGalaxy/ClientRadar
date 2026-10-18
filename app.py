@@ -434,13 +434,16 @@ def main():
 
     st.markdown(f"""
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        @import url('https://cdn.jsdelivr.net/npm/@fontsource/open-sauce-sans@latest/400.css');
+        @import url('https://cdn.jsdelivr.net/npm/@fontsource/open-sauce-sans@latest/600.css');
+        @import url('https://cdn.jsdelivr.net/npm/@fontsource/open-sauce-sans@latest/700.css');
+        @import url('https://cdn.jsdelivr.net/npm/@fontsource/open-sauce-sans@latest/800.css');
         
-        /* Universal Typography: Enforce Plus Jakarta Sans everywhere */
+        /* Universal Typography: Enforce Open Sauce Sans everywhere */
         *, html, body, p, span, div, h1, h2, h3, h4, h5, h6, input, textarea, select, button, label,
         .stMarkdown, [data-testid="stMarkdownContainer"], [data-testid="stMarkdownContainer"] * {{
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-            letter-spacing: -0.01em;
+            font-family: 'Open Sauce Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            letter-spacing: -0.015em;
         }}
         
         /* Description Box */
