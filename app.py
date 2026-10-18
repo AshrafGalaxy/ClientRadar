@@ -243,6 +243,10 @@ def main():
     env_serpapi = os.getenv("SERPAPI_API_KEY", "")
     env_hf = os.getenv("HUGGINGFACE_TOKEN", "")
 
+    # Default credentials to .env
+    serpapi_key = env_serpapi
+    hf_token = env_hf
+
     # ==========================================================================
     # Sidebar: Theme Selector & Settings
     # ==========================================================================
@@ -253,47 +257,41 @@ def main():
         theme_mode = st.radio("Theme Mode", ["Dark", "Light"], horizontal=True, label_visibility="collapsed")
         is_dark = (theme_mode == "Dark")
         
-        st.caption("Add API credentials for live discovery and AI evaluation. Leave blank to run in demo mode.")
+        st.markdown("##### 🔌 Engine Configuration")
+        st.caption("Credentials load automatically from `.env`. No manual entry required.")
         
-        serpapi_key = st.text_input(
-            "SerpApi Key",
-            value=env_serpapi,
-            type="password",
-            help="Free key available at serpapi.com/manage-api-key"
-        )
-        
-        hf_token = st.text_input(
-            "Hugging Face Token",
-            value=env_hf,
-            type="password",
-            help="Read token for google/gemma-2-2b-it from huggingface.co/settings/tokens"
-        )
-
-        # Compact Status Row
-        col_st1, col_st2 = st.columns(2)
-        with col_st1:
-            if serpapi_key:
-                st.caption("🟢 SerpApi: Live")
-            else:
-                st.caption("🟡 SerpApi: Demo")
-        with col_st2:
-            if hf_token:
-                st.caption("🟢 Gemma 2: Live")
-            else:
-                st.caption("🟡 Gemma 2: Demo")
-
-        st.divider()
-        with st.expander("🔑 How to obtain keys"):
-            st.markdown("""
-            **1. SerpApi (100 free searches/mo):**
-            - Sign up at [serpapi.com](https://serpapi.com/users/sign_up)
-            - Copy key from [serpapi.com/manage-api-key](https://serpapi.com/manage-api-key)
+        # Connection status pills
+        if env_serpapi:
+            st.success("🟢 SerpApi: Connected (`.env`)")
+        else:
+            st.info("🟡 SerpApi: Demo Mode (Mock leads)")
             
-            **2. Hugging Face Gemma 2:**
-            - Sign up at [huggingface.co](https://huggingface.co)
-            - Accept model terms at [google/gemma-2-2b-it](https://huggingface.co/google/gemma-2-2b-it)
-            - Create Read token at [hf.co/settings/tokens](https://huggingface.co/settings/tokens)
+        if env_hf:
+            st.success("🟢 Gemma 2: Connected (`.env`)")
+        else:
+            st.info("🟡 Gemma 2: Demo Mode (Fast synthesis)")
+            
+        with st.expander("🔑 Setup `.env` File", expanded=False):
+            st.markdown("""
+            Add credentials to `.env` in project root:
+            ```env
+            SERPAPI_API_KEY=your_serpapi_key
+            HUGGINGFACE_TOKEN=hf_your_token
+            ```
+            - [Get SerpApi Key](https://serpapi.com/manage-api-key)
+            - [Get Gemma 2 Token](https://huggingface.co/settings/tokens)
             """)
+
+        with st.expander("⚙️ Manual Key Override (Optional)", expanded=False):
+            st.caption("Override keys for this browser session only:")
+            override_serp = st.text_input("SerpApi Key", value="", type="password", key="override_serp")
+            override_hf = st.text_input("Hugging Face Token", value="", type="password", key="override_hf")
+            if override_serp:
+                serpapi_key = override_serp
+            if override_hf:
+                hf_token = override_hf
+
+
         
         st.divider()
         st.markdown(f'<a href="https://github.com/AshrafGalaxy/ClientRadar" target="_blank" style="color: {"#94A3B8" if is_dark else "#475569"}; font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">{svg_icon("github", size=14, color="currentColor")} AshrafGalaxy/ClientRadar</a>', unsafe_allow_html=True)
@@ -376,6 +374,22 @@ def main():
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2) !important;
         }
+        [data-testid="stSidebarCollapsedControl"] button,
+        [data-testid="stSidebarCollapseButton"] button {
+            background-color: #111827 !important;
+            border: 1px solid #1F2937 !important;
+            color: #F8FAFC !important;
+        }
+        [data-testid="stSidebarCollapsedControl"] button:hover,
+        [data-testid="stSidebarCollapseButton"] button:hover {
+            border-color: #3B82F6 !important;
+            color: #60A5FA !important;
+        }
+        .engine-status-pill {
+            background: #111827 !important;
+            border: 1px solid #1F2937 !important;
+            color: #CBD5E1 !important;
+        }
         """
     else: # Light Mode
         theme_css = """
@@ -452,6 +466,22 @@ def main():
             color: #2563EB !important;
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12) !important;
+        }
+        [data-testid="stSidebarCollapsedControl"] button,
+        [data-testid="stSidebarCollapseButton"] button {
+            background-color: #FFFFFF !important;
+            border: 1px solid #E2E8F0 !important;
+            color: #0F172A !important;
+        }
+        [data-testid="stSidebarCollapsedControl"] button:hover,
+        [data-testid="stSidebarCollapseButton"] button:hover {
+            border-color: #2563EB !important;
+            color: #2563EB !important;
+        }
+        .engine-status-pill {
+            background: #FFFFFF !important;
+            border: 1px solid #E2E8F0 !important;
+            color: #334155 !important;
         }
         """
 
@@ -533,7 +563,33 @@ def main():
             padding-top: 1.2rem !important;
         }}
         
+        /* Ensure sidebar open/close toggle remains visible and styled */
         header[data-testid="stHeader"] {{
+            background: transparent !important;
+            height: 2.6rem !important;
+            z-index: 90 !important;
+            pointer-events: none !important;
+        }}
+        
+        header[data-testid="stHeader"] [data-testid="stSidebarCollapsedControl"],
+        [data-testid="stSidebarCollapsedControl"] {{
+            display: flex !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+            position: fixed !important;
+            top: 0.6rem !important;
+            left: 0.6rem !important;
+            z-index: 1001 !important;
+        }}
+
+        [data-testid="stSidebarCollapsedControl"] button,
+        [data-testid="stSidebarCollapseButton"] button {{
+            border-radius: 8px !important;
+            transition: all 0.2s ease !important;
+        }}
+
+        /* Hide Streamlit top-right default hamburger/deploy menu */
+        header[data-testid="stHeader"] [data-testid="stToolbar"] {{
             display: none !important;
         }}
         
@@ -545,6 +601,24 @@ def main():
             justify-content: space-between;
             align-items: center;
             gap: 16px;
+        }}
+        
+        .engine-status-pill {{
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }}
+        
+        .status-dot {{
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
         }}
         
         .github-top-badge {{
@@ -651,17 +725,26 @@ def main():
     # ==============================================================================
     # Page Header (Single, Zero Top Gap)
     # ==============================================================================
+    engine_status_dot = "#10B981" if (serpapi_key and hf_token) else ("#F59E0B" if (serpapi_key or hf_token) else "#64748B")
+    engine_status_label = "⚡ Live Engine (.env)" if (serpapi_key and hf_token) else ("🟡 Partial (.env)" if (serpapi_key or hf_token) else "Demo Engine")
+
     st.markdown(f"""
     <div class="page-header">
         <div>
             <h1 class="page-title">{svg_icon('radar', size=26, color='#2563EB')} ClientRadar</h1>
             <div class="page-subtitle">Autonomous freelance contract discovery & AI proposal engine</div>
         </div>
-        <a href="https://github.com/AshrafGalaxy/ClientRadar" target="_blank" rel="noopener noreferrer" class="github-top-badge" title="View repository on GitHub">
-            {svg_icon('github', size=17, color='currentColor')}
-            <span>GitHub</span>
-            {svg_icon('external', size=12, color='currentColor')}
-        </a>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="engine-status-pill" title="Engine status based on .env configuration">
+                <span class="status-dot" style="background-color: {engine_status_dot};"></span>
+                <span>{engine_status_label}</span>
+            </div>
+            <a href="https://github.com/AshrafGalaxy/ClientRadar" target="_blank" rel="noopener noreferrer" class="github-top-badge" title="View repository on GitHub">
+                {svg_icon('github', size=17, color='currentColor')}
+                <span>GitHub</span>
+                {svg_icon('external', size=12, color='currentColor')}
+            </a>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
