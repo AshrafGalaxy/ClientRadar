@@ -331,20 +331,31 @@ def main():
         }
         .score-panel {
             background: #111827 !important;
-            border: 1px solid #1F2937 !important;
-            border-left: 4px solid #10B981 !important;
+            border: 1px solid #1E293B !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important;
         }
         .score-badge {
             background: rgba(16, 185, 129, 0.15) !important;
             color: #34D399 !important;
             border: 1px solid rgba(16, 185, 129, 0.3) !important;
         }
-        .stTabs [aria-selected="true"] {
-            color: #60A5FA !important;
-            border-bottom: 2px solid #3B82F6 !important;
+        .stTabs [data-baseweb="tab-list"] {
+            background: #0B0F19 !important;
+            border: 1px solid #1F2937 !important;
         }
         .stTabs [data-baseweb="tab"] {
             color: #94A3B8 !important;
+        }
+        .stTabs [aria-selected="true"] {
+            background: #1E293B !important;
+            color: #F8FAFC !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3) !important;
+        }
+        .email-subject-label {
+            color: #94A3B8 !important;
+        }
+        .email-subject-val {
+            color: #60A5FA !important;
         }
         .desc-box {
             background: #111827 !important;
@@ -435,21 +446,32 @@ def main():
             border: 1px solid #E2E8F0 !important;
         }
         .score-panel {
-            background: #F0FDF4 !important;
-            border: 1px solid #DCFCE7 !important;
-            border-left: 4px solid #16A34A !important;
+            background: #F8FAFC !important;
+            border: 1px solid #E2E8F0 !important;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04) !important;
         }
         .score-badge {
-            background: #DCFCE7 !important;
-            color: #15803D !important;
-            border: 1px solid #BBF7D0 !important;
+            background: #ECFDF5 !important;
+            color: #059669 !important;
+            border: 1px solid #A7F3D0 !important;
         }
-        .stTabs [aria-selected="true"] {
-            color: #2563EB !important;
-            border-bottom: 2px solid #2563EB !important;
+        .stTabs [data-baseweb="tab-list"] {
+            background: #F1F5F9 !important;
+            border: 1px solid #E2E8F0 !important;
         }
         .stTabs [data-baseweb="tab"] {
             color: #64748B !important;
+        }
+        .stTabs [aria-selected="true"] {
+            background: #FFFFFF !important;
+            color: #0F172A !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06) !important;
+        }
+        .email-subject-label {
+            color: #64748B !important;
+        }
+        .email-subject-val {
+            color: #1D4ED8 !important;
         }
         .desc-box {
             background: #FFFFFF !important;
@@ -520,7 +542,10 @@ def main():
         /* Typography: Apply Open Sauce Sans to text and UI elements */
         body, .stApp, p, h1, h2, h3, h4, h5, h6, input, textarea, select, button, label,
         .desc-box, .email-preview, .page-title, .page-subtitle, .stat-val, .stat-label, .tag-chip,
-        .score-panel, [data-testid="stMarkdownContainer"] p, .github-top-badge {{
+        .score-panel, .score-panel *, .email-subject-label, .email-subject-val,
+        [data-testid="stMarkdownContainer"] p, [data-testid="stMarkdownContainer"] div,
+        [data-testid="stMarkdownContainer"] span:not([data-testid*="Icon"]):not(.material-symbols-rounded),
+        .github-top-badge {{
             font-family: 'Open Sauce Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             letter-spacing: -0.015em;
         }}
@@ -564,12 +589,11 @@ def main():
             margin-top: 4px;
         }}
         
-        /* Viability Scorecard Panel */
+        /* Viability Scorecard Panel: clean uniform border with elegant elevation */
         .score-panel {{
-            border-radius: 10px !important;
+            border-radius: 12px !important;
             padding: 16px 20px !important;
             margin: 14px 0 18px 0 !important;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
         }}
         
         .score-badge {{
@@ -582,18 +606,39 @@ def main():
             letter-spacing: -0.01em;
         }}
 
-        /* Clean Tab Navigation */
+        /* Segmented Control Tab Switch */
         .stTabs [data-baseweb="tab-list"] {{
-            gap: 8px !important;
-            padding-bottom: 2px !important;
+            display: inline-flex !important;
+            gap: 4px !important;
+            padding: 4px !important;
+            border-radius: 8px !important;
+            margin-bottom: 12px !important;
+        }}
+        .stTabs [data-baseweb="tab-highlight"] {{
+            display: none !important;
         }}
         .stTabs [data-baseweb="tab"] {{
-            border-radius: 6px 6px 0 0 !important;
-            padding: 8px 16px !important;
+            border-radius: 6px !important;
+            padding: 6px 14px !important;
             font-weight: 600 !important;
-            font-size: 0.88rem !important;
+            font-size: 0.84rem !important;
             border: none !important;
             background: transparent !important;
+            transition: all 0.15s ease !important;
+        }}
+        
+        /* Email Subject Typography */
+        .email-subject-label {{
+            font-size: 0.74rem !important;
+            text-transform: uppercase !important;
+            font-weight: 600 !important;
+            letter-spacing: 0.05em !important;
+        }}
+        .email-subject-val {{
+            font-size: 0.96rem !important;
+            font-weight: 700 !important;
+            letter-spacing: -0.015em !important;
+            margin-top: 1px !important;
         }}
         
         /* Rendered Email Preview Container */
@@ -937,14 +982,17 @@ def main():
                     
                     pitch_content = res.get("pitch", "")
                     
-                    # Tabbed Pitch Display: Rendered Preview by Default vs Raw Markdown
-                    tab_preview, tab_raw = st.tabs(["✉️ Rendered Pitch Preview", "📝 Edit Raw Markdown"])
+                    # Segmented View: Rendered Pitch vs Raw Markdown
+                    tab_preview, tab_raw = st.tabs(["✉️ Rendered Pitch", "📝 Edit Markdown"])
                     
                     with tab_preview:
                         with st.container(border=True):
                             c_sub, c_tag = st.columns([3.5, 1])
                             with c_sub:
-                                st.markdown(f"<span style='font-size: 0.78rem; text-transform: uppercase; font-weight: 600; letter-spacing: 0.04em; color: {'#94A3B8' if is_dark else '#64748B'};'>Subject</span><div style='font-size: 0.96rem; font-weight: 700; color: {'#60A5FA' if is_dark else '#1D4ED8'}; margin-top: 1px;'>{res.get('subject', '')}</div>", unsafe_allow_html=True)
+                                st.markdown(f"""
+                                <div class="email-subject-label">Subject</div>
+                                <div class="email-subject-val">{res.get('subject', '')}</div>
+                                """, unsafe_allow_html=True)
                             with c_tag:
                                 st.markdown(f"<div style='text-align: right;'><span class='tag-chip' style='font-size: 0.78rem;'>{tone}</span></div>", unsafe_allow_html=True)
                             
@@ -955,20 +1003,8 @@ def main():
                         st.text_input("Subject:", value=res.get("subject", ""), key=f"subj_{i}")
                         st.text_area("Raw Markdown:", value=pitch_content, height=200, key=f"pitch_text_{i}")
                     
-                    # 1-Click Download Action Bar
-                    full_export = f"""# Proposal for {lead['title']}
-**Company:** {lead['company_name']}
-**Source:** {lead['via']}
-**Original Posting:** {lead['link']}
-**Viability Score:** {score}/100
-
----
-
-## Subject: {res.get('subject', '')}
-
-{pitch_content}
-"""
-                    c_dl, c_hint = st.columns([1.5, 1])
+                    # 1-Click Download Action Bar with exact vertical alignment
+                    c_dl, c_hint = st.columns([1.4, 1.2], vertical_alignment="center")
                     with c_dl:
                         st.download_button(
                             label=f"📥 Download Proposal ({lead['company_name']}.md)",
@@ -979,7 +1015,15 @@ def main():
                             use_container_width=True
                         )
                     with c_hint:
-                        st.caption("Ready to send via email or job portal.")
+                        st.markdown(
+                            f"""
+                            <div style="display: flex; align-items: center; gap: 7px; font-size: 0.82rem; color: {'#94A3B8' if is_dark else '#64748B'}; font-weight: 500; height: 100%; min-height: 38px;">
+                                {svg_icon('check', size=15, color='#10B981')}
+                                <span>Ready to send via email or job portal</span>
+                            </div>
+                            """,
+                            unsafe_allow_html=True
+                        )
 
 if __name__ == "__main__":
     main()
