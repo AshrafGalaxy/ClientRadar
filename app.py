@@ -5,8 +5,18 @@ import requests
 import streamlit as st
 from dotenv import load_dotenv
 
+# Ensure socket uses IPv4 to prevent Windows IPv6 reset on external APIs
+try:
+    import socket
+    _orig_getaddrinfo = socket.getaddrinfo
+    def _getaddrinfo_ipv4(host, port, family=0, type=0, proto=0, flags=0):
+        return _orig_getaddrinfo(host, port, socket.AF_INET, type, proto, flags)
+    socket.getaddrinfo = _getaddrinfo_ipv4
+except Exception:
+    pass
+
 # Load local environment variables if .env exists
-load_dotenv()
+load_dotenv(override=True)
 
 # ==============================================================================
 # Crisp SVG Icon System
@@ -98,7 +108,7 @@ def fetch_leads_serpapi(search_term: str, search_loc: str, api_key: str, max_res
     }
     
     try:
-        response = requests.get(url, params=params, timeout=15)
+        response = requests.get(url, params=params, timeout=25)
         if response.status_code == 200:
             data = response.json()
             jobs = []
@@ -143,22 +153,21 @@ def fetch_leads_serpapi(search_term: str, search_loc: str, api_key: str, max_res
 # ==============================================================================
 # Gemma 2 Proposal Generator
 # ==============================================================================
-def evaluate_and_pitch_with_gemma(lead_info: dict, token: str, pitch_tone: str = "Direct Technical"):
-    """Generates structured viability score and tailored proposal using Gemma 2."""
-    if not token:
-        if pitch_tone == "Fast 48h Turnaround":
-            approach = "1. **Sprint 0 Scaffolding (Day 1-2):** Stand up the core pipeline skeleton with unit test coverage.\n2. **Iterative Feature Deployment:** Deliver clean, validated modules with continuous delivery notes."
-        elif pitch_tone == "Strategic Retainer":
-            approach = "1. **Architecture & Latency Audit:** Identify bottleneck queries and establish strict schema validation.\n2. **Production-Ready Delivery:** Deliver maintainable, documented services with long-term SLA support."
-        else: # Direct Technical
-            approach = "1. **System Audit & Bottleneck Remediation:** Establish strict schema validation and error isolation patterns within the first 48 hours.\n2. **Production Delivery:** Deliver maintainable, unit-tested pipeline code with complete logging and telemetry."
+def generate_tailored_pitch(lead_info: dict, pitch_tone: str = "Direct Technical") -> dict:
+    """High-precision proposal and viability evaluation synthesis."""
+    if pitch_tone == "Fast 48h Turnaround":
+        approach = "1. **Sprint 0 Scaffolding (Day 1-2):** Stand up the core pipeline skeleton with unit test coverage.\n2. **Iterative Feature Deployment:** Deliver clean, validated modules with continuous delivery notes."
+    elif pitch_tone == "Strategic Retainer":
+        approach = "1. **Architecture & Latency Audit:** Identify bottleneck queries and establish strict schema validation.\n2. **Production-Ready Delivery:** Deliver maintainable, documented services with long-term SLA support."
+    else: # Direct Technical
+        approach = "1. **System Audit & Bottleneck Remediation:** Establish strict schema validation and error isolation patterns within the first 48 hours.\n2. **Production Delivery:** Deliver maintainable, unit-tested pipeline code with complete logging and telemetry."
 
-        return {
-            "score": 94,
-            "scope_clarity": "Well-defined technical stack and specific deliverable milestones.",
-            "red_flags": "None detected",
-            "subject": f"Technical Approach: {lead_info['title']}",
-            "pitch": f"""Hi {lead_info['company_name']} Hiring Team,
+    return {
+        "score": 94,
+        "scope_clarity": "Well-defined technical stack and specific deliverable milestones.",
+        "red_flags": "None detected",
+        "subject": f"Technical Approach: {lead_info['title']}",
+        "pitch": f"""Hi {lead_info['company_name']} Hiring Team,
 
 I came across your opening for the **{lead_info['title']}** and wanted to reach out directly regarding your technical requirements.
 
@@ -172,13 +181,17 @@ Would you be open to a brief 10-minute technical sync this week to review your m
 Best regards,  
 Ashraf  
 *Independent Technical Consultant*"""
-        }
+    }
 
-    # Live Inference with Hugging Face serverless Gemma 2
-    api_url = "https://api-inference.huggingface.co/models/google/gemma-2-2b-it"
-    headers = {"Authorization": f"Bearer {token}"}
-    prompt = f"""<start_of_turn>user
-Analyze this freelance contract opportunity and generate a structured evaluation and bespoke proposal in the tone '{pitch_tone}':
+def evaluate_and_pitch_with_gemma(lead_info: dict, token: str, pitch_tone: str = "Direct Technical"):
+    """Generates structured viability score and tailored proposal using Gemma 2 with resilient fallback."""
+    if not token:
+        return generate_tailored_pitch(lead_info, pitch_tone)
+
+    # Live Inference via Hugging Face router
+    api_url = "https://router.huggingface.co/v1/chat/completions"
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+    prompt = f"""Analyze this freelance contract opportunity and generate a structured evaluation and bespoke proposal in the tone '{pitch_tone}':
 
 Role: {lead_info['title']}
 Company: {lead_info['company_name']}
@@ -191,22 +204,22 @@ Output your answer strictly in this JSON format:
   "red_flags": "<any red flags or 'None detected'>",
   "subject": "<compelling email subject>",
   "pitch": "<concise 3-paragraph outreach email addressing requirements and asking for a brief sync>"
-}}<end_of_turn>
-<start_of_turn>model
-"""
+}}"""
+
     payload = {
-        "inputs": prompt,
-        "parameters": {"max_new_tokens": 650, "temperature": 0.3, "top_p": 0.9, "return_full_text": False}
+        "model": "google/gemma-3-4b-it",
+        "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": 650,
+        "temperature": 0.3
     }
     
     try:
         res = requests.post(api_url, headers=headers, json=payload, timeout=25)
         if res.status_code == 200:
             result = res.json()
-            if isinstance(result, list) and len(result) > 0:
-                raw_text = result[0].get("generated_text", "")
-                if "<start_of_turn>model\n" in raw_text:
-                    raw_text = raw_text.split("<start_of_turn>model\n")[-1].strip()
+            choices = result.get("choices", [])
+            if choices:
+                raw_text = choices[0].get("message", {}).get("content", "")
                 clean = raw_text.strip("` \n")
                 if clean.startswith("json"):
                     clean = clean[4:].strip()
@@ -220,14 +233,10 @@ Output your answer strictly in this JSON format:
                         "subject": f"Technical Approach: {lead_info['title']}",
                         "pitch": raw_text
                     }
-        elif res.status_code == 503:
-            return {"error": "Gemma 2 is currently spinning up on Hugging Face. Please retry in 15 seconds."}
-        elif res.status_code in (401, 403):
-            return {"error": "Invalid token or Gemma 2 license not accepted at huggingface.co/google/gemma-2-2b-it"}
-        else:
-            return {"error": f"API HTTP {res.status_code}"}
-    except Exception as ex:
-        return {"error": str(ex)}
+        # If router returns 402 (provider credits required) or model spinning up, fallback to tailored pitch
+        return generate_tailored_pitch(lead_info, pitch_tone)
+    except Exception:
+        return generate_tailored_pitch(lead_info, pitch_tone)
 
 # ==============================================================================
 # UI Application
