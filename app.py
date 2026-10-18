@@ -22,7 +22,8 @@ def svg_icon(name: str, size: int = 15, color: str = "currentColor") -> str:
         "shield": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>',
         "clock": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
         "check": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
-        "building": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/></svg>'
+        "building": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4"/></svg>',
+        "github": f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="{color}"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>'
     }
     return icons.get(name, "")
 
@@ -295,7 +296,7 @@ def main():
             """)
         
         st.divider()
-        st.markdown(f'<a href="https://github.com/AshrafGalaxy/client-radar-ai" target="_blank" style="color: {"#94A3B8" if is_dark else "#475569"}; font-size: 0.82rem; text-decoration: none;">{svg_icon("external", size=13)} GitHub Repository</a>', unsafe_allow_html=True)
+        st.markdown(f'<a href="https://github.com/AshrafGalaxy/ClientRadar" target="_blank" style="color: {"#94A3B8" if is_dark else "#475569"}; font-size: 0.82rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">{svg_icon("github", size=14, color="currentColor")} AshrafGalaxy/ClientRadar</a>', unsafe_allow_html=True)
 
     # ==============================================================================
     # Dynamic CSS Injection (Zero Blank Top Padding + Dark/Light Theme System)
@@ -364,6 +365,17 @@ def main():
             border-color: #3B82F6 !important;
             color: #BFDBFE !important;
         }
+        .github-top-badge {
+            background: #111827 !important;
+            border: 1px solid #1F2937 !important;
+            color: #F8FAFC !important;
+        }
+        .github-top-badge:hover {
+            border-color: #3B82F6 !important;
+            color: #60A5FA !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2) !important;
+        }
         """
     else: # Light Mode
         theme_css = """
@@ -430,20 +442,63 @@ def main():
             border-color: #2563EB !important;
             color: #1D4ED8 !important;
         }
+        .github-top-badge {
+            background: #FFFFFF !important;
+            border: 1px solid #E2E8F0 !important;
+            color: #0F172A !important;
+        }
+        .github-top-badge:hover {
+            border-color: #2563EB !important;
+            color: #2563EB !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12) !important;
+        }
         """
 
     st.markdown(f"""
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
         @import url('https://cdn.jsdelivr.net/npm/@fontsource/open-sauce-sans@latest/400.css');
         @import url('https://cdn.jsdelivr.net/npm/@fontsource/open-sauce-sans@latest/600.css');
         @import url('https://cdn.jsdelivr.net/npm/@fontsource/open-sauce-sans@latest/700.css');
         @import url('https://cdn.jsdelivr.net/npm/@fontsource/open-sauce-sans@latest/800.css');
         
-        /* Universal Typography: Enforce Open Sauce Sans everywhere */
-        *, html, body, p, span, div, h1, h2, h3, h4, h5, h6, input, textarea, select, button, label,
-        .stMarkdown, [data-testid="stMarkdownContainer"], [data-testid="stMarkdownContainer"] * {{
+        /* Typography: Apply Open Sauce Sans to text and UI elements */
+        body, .stApp, p, h1, h2, h3, h4, h5, h6, input, textarea, select, button, label,
+        .desc-box, .email-preview, .page-title, .page-subtitle, .stat-val, .stat-label, .tag-chip,
+        .score-panel, [data-testid="stMarkdownContainer"] p, .github-top-badge {{
             font-family: 'Open Sauce Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
             letter-spacing: -0.015em;
+        }}
+
+        /* Strict Material Symbols enforcement for expander arrows and Streamlit icon ligatures */
+        [data-testid="stExpanderToggleIcon"],
+        [data-testid="stExpanderToggleIcon"] *,
+        [data-testid*="Icon" i],
+        [data-testid*="icon" i],
+        summary [data-testid*="Icon" i],
+        summary [data-testid*="icon" i],
+        .material-symbols-rounded,
+        .material-icons,
+        [class*="material-symbols"] {{
+            font-family: 'Material Symbols Rounded', 'Material Icons' !important;
+            font-style: normal !important;
+            font-weight: 400 !important;
+            font-size: 20px !important;
+            line-height: 1 !important;
+            letter-spacing: normal !important;
+            text-transform: none !important;
+            display: inline-block !important;
+            white-space: nowrap !important;
+            word-wrap: normal !important;
+            direction: ltr !important;
+            -webkit-font-feature-settings: 'liga' !important;
+            -webkit-font-smoothing: antialiased !important;
+        }}
+
+        svg, svg * {{
+            font-family: inherit !important;
+            letter-spacing: normal !important;
         }}
         
         /* Description Box */
@@ -486,6 +541,23 @@ def main():
         .page-header {{
             margin-bottom: 20px;
             padding-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }}
+        
+        .github-top-badge {{
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 13px;
+            border-radius: 8px;
+            font-size: 0.84rem;
+            font-weight: 600;
+            text-decoration: none !important;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
         }}
         
         .page-title {{
@@ -579,10 +651,17 @@ def main():
     # ==============================================================================
     # Page Header (Single, Zero Top Gap)
     # ==============================================================================
-    st.markdown("""
+    st.markdown(f"""
     <div class="page-header">
-        <h1 class="page-title">ClientRadar</h1>
-        <div class="page-subtitle">Autonomous freelance contract discovery & AI proposal engine</div>
+        <div>
+            <h1 class="page-title">{svg_icon('radar', size=26, color='#2563EB')} ClientRadar</h1>
+            <div class="page-subtitle">Autonomous freelance contract discovery & AI proposal engine</div>
+        </div>
+        <a href="https://github.com/AshrafGalaxy/ClientRadar" target="_blank" rel="noopener noreferrer" class="github-top-badge" title="View repository on GitHub">
+            {svg_icon('github', size=17, color='currentColor')}
+            <span>GitHub</span>
+            {svg_icon('external', size=12, color='currentColor')}
+        </a>
     </div>
     """, unsafe_allow_html=True)
 
