@@ -241,7 +241,7 @@ def main():
     )
 
     env_serpapi = os.getenv("SERPAPI_API_KEY", "")
-    env_hf = os.getenv("HUGGINGFACE_TOKEN", "")
+    env_hf = os.getenv("HUGGINGFACE_TOKEN", "") or os.getenv("HF_TOKEN", "") or os.getenv("HUGGINGFACE_API_KEY", "")
 
     # Default credentials to .env
     serpapi_key = env_serpapi
@@ -257,19 +257,19 @@ def main():
         theme_mode = st.radio("Theme Mode", ["Dark", "Light"], horizontal=True, label_visibility="collapsed")
         is_dark = (theme_mode == "Dark")
         
-        st.markdown("##### 🔌 Engine Configuration")
+        st.markdown("##### 🔌 Backend Status")
         st.caption("Credentials load automatically from `.env`. No manual entry required.")
         
-        # Connection status pills
+        # Connection status indicators
         if env_serpapi:
             st.success("🟢 SerpApi: Connected (`.env`)")
         else:
-            st.info("🟡 SerpApi: Demo Mode (Mock leads)")
+            st.caption("⚪ SerpApi: Offline (No API key found)")
             
         if env_hf:
             st.success("🟢 Gemma 2: Connected (`.env`)")
         else:
-            st.info("🟡 Gemma 2: Demo Mode (Fast synthesis)")
+            st.caption("⚪ Gemma 2: Offline (No API key found)")
             
         with st.expander("🔑 Setup `.env` File", expanded=False):
             st.markdown("""
@@ -982,8 +982,18 @@ def main():
     # ==============================================================================
     # Page Header (Single, Zero Top Gap)
     # ==============================================================================
-    engine_status_dot = "#10B981" if (serpapi_key and hf_token) else ("#F59E0B" if (serpapi_key or hf_token) else "#64748B")
-    engine_status_label = "⚡ Live Engine (.env)" if (serpapi_key and hf_token) else ("🟡 Partial (.env)" if (serpapi_key or hf_token) else "Demo Engine")
+    if serpapi_key and hf_token:
+        backend_status_dot = "#10B981"
+        backend_status_label = "Backend Online"
+        backend_tooltip = "Backend operational: SerpApi & Hugging Face Gemma 2 active"
+    elif serpapi_key or hf_token:
+        backend_status_dot = "#F59E0B"
+        backend_status_label = "Backend Degraded"
+        backend_tooltip = "Backend partially configured: 1 of 2 API keys active in .env"
+    else:
+        backend_status_dot = "#64748B"
+        backend_status_label = "Backend Offline"
+        backend_tooltip = "Backend offline: Set SERPAPI_API_KEY and HUGGINGFACE_TOKEN in .env"
 
     st.markdown(f"""
     <div class="page-header">
@@ -992,9 +1002,9 @@ def main():
             <div class="page-subtitle">Autonomous freelance contract discovery & AI proposal engine</div>
         </div>
         <div style="display: flex; align-items: center; gap: 10px;">
-            <div class="engine-status-pill" title="Engine status based on .env configuration">
-                <span class="status-dot" style="background-color: {engine_status_dot};"></span>
-                <span>{engine_status_label}</span>
+            <div class="engine-status-pill" title="{backend_tooltip}">
+                <span class="status-dot" style="background-color: {backend_status_dot};"></span>
+                <span>{backend_status_label}</span>
             </div>
             <a href="https://github.com/AshrafGalaxy/ClientRadar" target="_blank" rel="noopener noreferrer" class="github-top-badge" title="View repository on GitHub">
                 {svg_icon('github', size=17, color='currentColor')}
