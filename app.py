@@ -339,24 +339,42 @@ def main():
             color: #34D399 !important;
             border: 1px solid rgba(16, 185, 129, 0.3) !important;
         }
+        /* Modern Segmented Control Tab Switch (Dark Mode) */
+        [data-testid="stTabs"] [role="tablist"],
+        .stTabs [role="tablist"],
+        .react-aria-TabList,
         .stTabs [data-baseweb="tab-list"] {
-            background: #0F172A !important;
-            border: 1px solid #1E293B !important;
-            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25) !important;
+            background: #0B0F19 !important;
+            border: 1px solid #1F2937 !important;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4) !important;
         }
+        [data-testid="stTabs"] [role="tab"],
+        .stTabs [role="tab"],
+        [data-testid="stTab"],
+        .react-aria-Tab,
         .stTabs [data-baseweb="tab"] {
             color: #94A3B8 !important;
             border: 1px solid transparent !important;
         }
+        [data-testid="stTabs"] [role="tab"]:hover,
+        .stTabs [role="tab"]:hover,
+        [data-testid="stTab"]:hover,
+        .react-aria-Tab:hover,
         .stTabs [data-baseweb="tab"]:hover {
             color: #F8FAFC !important;
-            background: rgba(255, 255, 255, 0.04) !important;
+            background: rgba(255, 255, 255, 0.06) !important;
         }
+        [data-testid="stTabs"] [role="tab"][aria-selected="true"],
+        [data-testid="stTabs"] [role="tab"][data-selected],
+        .stTabs [role="tab"][aria-selected="true"],
+        .stTabs [role="tab"][data-selected],
+        [data-testid="stTab"][aria-selected="true"],
+        [data-testid="stTab"][data-selected],
         .stTabs [aria-selected="true"] {
             background: #1E293B !important;
             color: #60A5FA !important;
             border: 1px solid #3B82F6 !important;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
         }
         .email-subject-label {
             color: #94A3B8 !important;
@@ -462,24 +480,42 @@ def main():
             color: #059669 !important;
             border: 1px solid #A7F3D0 !important;
         }
+        /* Modern Segmented Control Tab Switch (Light Mode) */
+        [data-testid="stTabs"] [role="tablist"],
+        .stTabs [role="tablist"],
+        .react-aria-TabList,
         .stTabs [data-baseweb="tab-list"] {
             background: #F1F5F9 !important;
             border: 1px solid #E2E8F0 !important;
-            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05) !important;
         }
+        [data-testid="stTabs"] [role="tab"],
+        .stTabs [role="tab"],
+        [data-testid="stTab"],
+        .react-aria-Tab,
         .stTabs [data-baseweb="tab"] {
             color: #64748B !important;
             border: 1px solid transparent !important;
         }
+        [data-testid="stTabs"] [role="tab"]:hover,
+        .stTabs [role="tab"]:hover,
+        [data-testid="stTab"]:hover,
+        .react-aria-Tab:hover,
         .stTabs [data-baseweb="tab"]:hover {
             color: #0F172A !important;
             background: rgba(0, 0, 0, 0.04) !important;
         }
+        [data-testid="stTabs"] [role="tab"][aria-selected="true"],
+        [data-testid="stTabs"] [role="tab"][data-selected],
+        .stTabs [role="tab"][aria-selected="true"],
+        .stTabs [role="tab"][data-selected],
+        [data-testid="stTab"][aria-selected="true"],
+        [data-testid="stTab"][data-selected],
         .stTabs [aria-selected="true"] {
             background: #FFFFFF !important;
             color: #1D4ED8 !important;
             border: 1px solid #BFDBFE !important;
-            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.08) !important;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1) !important;
         }
         .email-subject-label {
             color: #64748B !important;
@@ -620,36 +656,131 @@ def main():
             letter-spacing: -0.01em;
         }}
 
-        /* Segmented Control Tab Switch: spacious, clean, and modern */
+        /* Segmented Control Tab Switch: robust modern pill styling */
+        [data-testid="stTabs"] [role="tablist"],
+        .stTabs [role="tablist"],
+        .react-aria-TabList,
         .stTabs [data-baseweb="tab-list"] {{
             display: inline-flex !important;
-            gap: 10px !important;
-            padding: 6px !important;
+            gap: 6px !important;
+            padding: 4px !important;
             border-radius: 10px !important;
-            margin: 18px 0 16px 0 !important;
+            margin: 16px 0 14px 0 !important;
+            border-bottom: none !important;
+            width: auto !important;
+            position: relative !important;
         }}
+        
+        /* 100% SUPPRESS default red underlines, borders, and BaseWeb indicators */
+        [data-testid="stTabs"] .react-aria-SelectionIndicator,
+        .react-aria-SelectionIndicator,
+        [data-testid="stTabs"] [role="tablist"]::after,
+        .stTabs [role="tablist"]::after,
         .stTabs [data-baseweb="tab-highlight"],
         .stTabs [data-baseweb="tab-border"] {{
             display: none !important;
+            height: 0 !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            background: transparent !important;
+            border: none !important;
+            content: none !important;
         }}
+        
+        /* Eliminate browser default focus outlines and blue focus rings */
+        [data-testid="stTabs"] [role="tab"],
+        [data-testid="stTabs"] [role="tab"]:focus,
+        [data-testid="stTabs"] [role="tab"][data-focused],
+        [data-testid="stTabs"] [role="tab"][data-focus-visible],
+        [data-testid="stTab"],
+        [data-testid="stTab"]:focus,
+        [data-testid="stTab"][data-focused],
+        [data-testid="stTab"][data-focus-visible],
         .stTabs [data-baseweb="tab"] {{
-            height: auto !important;
-            min-height: 38px !important;
-            border-radius: 8px !important;
-            padding: 8px 20px !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }}
+        
+        /* Pill button styles */
+        [data-testid="stTabs"] [role="tab"],
+        .stTabs [role="tab"],
+        [data-testid="stTab"],
+        .react-aria-Tab,
+        .stTabs [data-baseweb="tab"] {{
+            height: 36px !important;
+            min-height: 36px !important;
+            border-radius: 7px !important;
+            padding: 0 18px !important;
             font-weight: 600 !important;
             font-size: 0.86rem !important;
+            letter-spacing: -0.01em !important;
             border: 1px solid transparent !important;
             background: transparent !important;
-            transition: all 0.18s ease-in-out !important;
+            transition: all 0.16s ease-in-out !important;
             cursor: pointer !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            white-space: nowrap !important;
         }}
-        .stTabs [data-baseweb="tab"] > div {{
-            padding: 0 !important;
+        
+        [data-testid="stTabs"] [role="tab"] p,
+        [data-testid="stTabs"] [role="tab"] div,
+        [data-testid="stTabs"] [role="tab"] span,
+        [data-testid="stTab"] p,
+        [data-testid="stTab"] div,
+        [data-testid="stTab"] span {{
             margin: 0 !important;
+            padding: 0 !important;
+            font-family: 'Open Sauce Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            font-size: inherit !important;
+            font-weight: inherit !important;
+            line-height: 1 !important;
+            color: inherit !important;
+        }}
+        
+        /* Pixel-Perfect Action Bar Alignment */
+        div[data-testid="stHorizontalBlock"]:has(.action-bar-status) {{
+            align-items: center !important;
+            margin-top: 10px !important;
+        }}
+        div[data-testid="stHorizontalBlock"]:has(.action-bar-status) [data-testid="stColumn"] {{
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+        }}
+        div[data-testid="stHorizontalBlock"]:has(.action-bar-status) [data-testid="stVerticalBlock"] {{
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            gap: 0 !important;
+        }}
+        div[data-testid="stHorizontalBlock"]:has(.action-bar-status) [data-testid="stElementContainer"] {{
+            margin: 0 !important;
+            padding: 0 !important;
             display: flex !important;
             align-items: center !important;
-            gap: 6px !important;
+        }}
+        div[data-testid="stHorizontalBlock"]:has(.action-bar-status) [data-testid="stMarkdownContainer"] {{
+            margin: 0 !important;
+            padding: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+        }}
+        .action-bar-status {{
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            font-size: 0.84rem !important;
+            font-weight: 500 !important;
+            height: 38.4px !important;
+            line-height: 38.4px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }}
+        .action-bar-status svg {{
+            display: block !important;
+            flex-shrink: 0 !important;
         }}
         
         /* Email Subject Typography */
@@ -1056,7 +1187,7 @@ def main():
                     with c_hint:
                         st.markdown(
                             f"""
-                            <div style="display: flex; align-items: center; gap: 7px; font-size: 0.82rem; color: {'#94A3B8' if is_dark else '#64748B'}; font-weight: 500; height: 100%; min-height: 38px;">
+                            <div class="action-bar-status" style="color: {'#94A3B8' if is_dark else '#64748B'};">
                                 {svg_icon('check', size=15, color='#10B981')}
                                 <span>Ready to send via email or job portal</span>
                             </div>
