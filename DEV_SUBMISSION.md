@@ -2,7 +2,7 @@
 title: "ClientRadar AI: Freelance Lead Arbitrage Engine with SerpApi & Gemma 2"
 published: true
 tags: devchallenge, hf26challenge, hacktoberfest, ai
-canonical_url: https://github.com/AshrafGalaxy/client-radar-ai
+canonical_url: https://github.com/AshrafGalaxy/ClientRadar
 ---
 
 *This is a submission for the [Hacktoberfest Open-Source AI Challenge Week 2: Side Hustle](https://dev.to/challenges/hacktoberfest-week2-2026-10-12)*
@@ -59,7 +59,7 @@ Building ClientRadar on proprietary, closed APIs creates fatal operational liabi
 ---
 
 ## 6. Code Repository & Demonstration
-- **GitHub Repository:** [https://github.com/AshrafGalaxy/client-radar-ai](https://github.com/AshrafGalaxy/client-radar-ai)
+- **GitHub Repository:** [https://github.com/AshrafGalaxy/ClientRadar](https://github.com/AshrafGalaxy/ClientRadar)
 - **Live Application Workflow:**
   1. Input target technical keywords (e.g., `FastAPI Backend Freelance`).
   2. Click **Scan for Qualified Leads** to pull live market opportunities via SerpApi.

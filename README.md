@@ -54,8 +54,8 @@ Freelancers and boutique technical consultants spend 10-15 hours every week scan
 
 ### 1. Clone & Set Up Environment
 ```bash
-git clone https://github.com/AshrafGalaxy/client-radar-ai.git
-cd clientradar
+git clone https://github.com/AshrafGalaxy/ClientRadar.git
+cd ClientRadar
 
 # Create virtual environment
 python -m venv .venv
