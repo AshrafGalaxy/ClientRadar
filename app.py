@@ -340,16 +340,23 @@ def main():
             border: 1px solid rgba(16, 185, 129, 0.3) !important;
         }
         .stTabs [data-baseweb="tab-list"] {
-            background: #0B0F19 !important;
-            border: 1px solid #1F2937 !important;
+            background: #0F172A !important;
+            border: 1px solid #1E293B !important;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25) !important;
         }
         .stTabs [data-baseweb="tab"] {
             color: #94A3B8 !important;
+            border: 1px solid transparent !important;
+        }
+        .stTabs [data-baseweb="tab"]:hover {
+            color: #F8FAFC !important;
+            background: rgba(255, 255, 255, 0.04) !important;
         }
         .stTabs [aria-selected="true"] {
             background: #1E293B !important;
-            color: #F8FAFC !important;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3) !important;
+            color: #60A5FA !important;
+            border: 1px solid #3B82F6 !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
         }
         .email-subject-label {
             color: #94A3B8 !important;
@@ -458,14 +465,21 @@ def main():
         .stTabs [data-baseweb="tab-list"] {
             background: #F1F5F9 !important;
             border: 1px solid #E2E8F0 !important;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03) !important;
         }
         .stTabs [data-baseweb="tab"] {
             color: #64748B !important;
+            border: 1px solid transparent !important;
+        }
+        .stTabs [data-baseweb="tab"]:hover {
+            color: #0F172A !important;
+            background: rgba(0, 0, 0, 0.04) !important;
         }
         .stTabs [aria-selected="true"] {
             background: #FFFFFF !important;
-            color: #0F172A !important;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.06) !important;
+            color: #1D4ED8 !important;
+            border: 1px solid #BFDBFE !important;
+            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.08) !important;
         }
         .email-subject-label {
             color: #64748B !important;
@@ -606,25 +620,36 @@ def main():
             letter-spacing: -0.01em;
         }}
 
-        /* Segmented Control Tab Switch */
+        /* Segmented Control Tab Switch: spacious, clean, and modern */
         .stTabs [data-baseweb="tab-list"] {{
             display: inline-flex !important;
-            gap: 4px !important;
-            padding: 4px !important;
-            border-radius: 8px !important;
-            margin-bottom: 12px !important;
+            gap: 10px !important;
+            padding: 6px !important;
+            border-radius: 10px !important;
+            margin: 18px 0 16px 0 !important;
         }}
-        .stTabs [data-baseweb="tab-highlight"] {{
+        .stTabs [data-baseweb="tab-highlight"],
+        .stTabs [data-baseweb="tab-border"] {{
             display: none !important;
         }}
         .stTabs [data-baseweb="tab"] {{
-            border-radius: 6px !important;
-            padding: 6px 14px !important;
+            height: auto !important;
+            min-height: 38px !important;
+            border-radius: 8px !important;
+            padding: 8px 20px !important;
             font-weight: 600 !important;
-            font-size: 0.84rem !important;
-            border: none !important;
+            font-size: 0.86rem !important;
+            border: 1px solid transparent !important;
             background: transparent !important;
-            transition: all 0.15s ease !important;
+            transition: all 0.18s ease-in-out !important;
+            cursor: pointer !important;
+        }}
+        .stTabs [data-baseweb="tab"] > div {{
+            padding: 0 !important;
+            margin: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 6px !important;
         }}
         
         /* Email Subject Typography */
@@ -1000,10 +1025,24 @@ def main():
                             st.markdown(pitch_content)
                         
                     with tab_raw:
-                        st.text_input("Subject:", value=res.get("subject", ""), key=f"subj_{i}")
-                        st.text_area("Raw Markdown:", value=pitch_content, height=200, key=f"pitch_text_{i}")
+                        edit_subj = st.text_input("Subject:", value=res.get("subject", ""), key=f"subj_{i}")
+                        edit_pitch = st.text_area("Raw Markdown:", value=pitch_content, height=200, key=f"pitch_text_{i}")
                     
                     # 1-Click Download Action Bar with exact vertical alignment
+                    final_subj = edit_subj if edit_subj else res.get('subject', '')
+                    final_pitch = edit_pitch if edit_pitch else pitch_content
+                    full_export = f"""# Proposal for {lead['title']}
+**Company:** {lead['company_name']}
+**Source:** {lead['via']}
+**Original Posting:** {lead['link']}
+**Viability Score:** {score}/100
+
+---
+
+## Subject: {final_subj}
+
+{final_pitch}
+"""
                     c_dl, c_hint = st.columns([1.4, 1.2], vertical_alignment="center")
                     with c_dl:
                         st.download_button(
