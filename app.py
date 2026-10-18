@@ -335,6 +335,16 @@ def main():
             border: 1px solid #1F2937 !important;
             border-left: 3px solid #10B981 !important;
         }
+        .desc-box {
+            background: #111827 !important;
+            border: 1px solid #1F2937 !important;
+            color: #CBD5E1 !important;
+        }
+        .email-preview {
+            background: #111827 !important;
+            border: 1px solid #1F2937 !important;
+            color: #F1F5F9 !important;
+        }
         .stTextInput>div>div>input, .stSelectbox>div>div, .stTextArea>div>div>textarea {
             background-color: #131C2E !important;
             border: 1px solid #2A3854 !important;
@@ -391,6 +401,16 @@ def main():
             border: 1px solid #DCFCE7 !important;
             border-left: 3px solid #16A34A !important;
         }
+        .desc-box {
+            background: #FFFFFF !important;
+            border: 1px solid #E2E8F0 !important;
+            color: #334155 !important;
+        }
+        .email-preview {
+            background: #FFFFFF !important;
+            border: 1px solid #E2E8F0 !important;
+            color: #0F172A !important;
+        }
         .stTextInput>div>div>input, .stSelectbox>div>div, .stTextArea>div>div>textarea {
             background-color: #FFFFFF !important;
             border: 1px solid #CBD5E1 !important;
@@ -414,10 +434,34 @@ def main():
 
     st.markdown(f"""
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         
-        html, body, [class*="css"] {{
-            font-family: 'Inter', sans-serif;
+        /* Universal Typography: Enforce Plus Jakarta Sans everywhere */
+        *, html, body, p, span, div, h1, h2, h3, h4, h5, h6, input, textarea, select, button, label,
+        .stMarkdown, [data-testid="stMarkdownContainer"], [data-testid="stMarkdownContainer"] * {{
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+            letter-spacing: -0.01em;
+        }}
+        
+        /* Description Box */
+        .desc-box {{
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 0.88rem;
+            line-height: 1.55;
+            margin-top: 4px;
+        }}
+        
+        /* Rendered Email Preview Container */
+        .email-preview {{
+            border-radius: 8px;
+            padding: 14px 18px;
+            font-size: 0.92rem;
+            line-height: 1.6;
+            margin: 8px 0;
+        }}
+        .email-preview p {{
+            margin-bottom: 10px;
         }}
         
         /* Eliminate top blank space */
@@ -603,7 +647,7 @@ def main():
             
             with c_desc:
                 st.markdown("**Description**")
-                st.info(lead["description"])
+                st.markdown(f'<div class="desc-box">{lead["description"]}</div>', unsafe_allow_html=True)
                 
             with c_actions:
                 st.markdown("**Actions**")
@@ -654,9 +698,25 @@ def main():
                     </div>
                     """, unsafe_allow_html=True)
                     
-                    st.text_input("Subject:", value=res.get("subject", ""), key=f"subj_{i}")
                     pitch_content = res.get("pitch", "")
-                    st.text_area("Outreach Pitch:", value=pitch_content, height=200, key=f"pitch_text_{i}")
+                    
+                    # Tabbed Pitch Display: Rendered Preview by Default vs Raw Markdown
+                    tab_preview, tab_raw = st.tabs(["✉️ Rendered Pitch Preview", "📝 Edit Raw Markdown"])
+                    
+                    with tab_preview:
+                        st.markdown(f"""
+                        <div class="email-preview">
+                            <div style="font-size: 0.92rem; font-weight: 700; margin-bottom: 8px; color: {'#60A5FA' if is_dark else '#2563EB'};">
+                                Subject: {res.get('subject', '')}
+                            </div>
+                            <hr style="border: none; border-top: 1px solid {'#1F2937' if is_dark else '#E2E8F0'}; margin: 8px 0 14px 0;" />
+                        """, unsafe_allow_html=True)
+                        st.markdown(pitch_content)
+                        st.markdown("</div>", unsafe_allow_html=True)
+                        
+                    with tab_raw:
+                        st.text_input("Subject:", value=res.get("subject", ""), key=f"subj_{i}")
+                        st.text_area("Raw Markdown:", value=pitch_content, height=180, key=f"pitch_text_{i}")
                     
                     # 1-Click Download
                     full_export = f"""# Proposal for {lead['title']}
