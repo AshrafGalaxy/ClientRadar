@@ -531,7 +531,19 @@ def main():
     env_serpapi = os.getenv("SERPAPI_API_KEY", "")
     env_hf = os.getenv("HUGGINGFACE_TOKEN", "") or os.getenv("HF_TOKEN", "") or os.getenv("HUGGINGFACE_API_KEY", "")
 
-    # Default credentials to .env
+    # Seamless Streamlit Community Cloud secrets integration
+    try:
+        if not env_serpapi and hasattr(st, "secrets") and "SERPAPI_API_KEY" in st.secrets:
+            env_serpapi = str(st.secrets["SERPAPI_API_KEY"])
+        if not env_hf and hasattr(st, "secrets"):
+            for k in ["HUGGINGFACE_TOKEN", "HF_TOKEN", "HUGGINGFACE_API_KEY"]:
+                if k in st.secrets:
+                    env_hf = str(st.secrets[k])
+                    break
+    except Exception:
+        pass
+
+    # Default credentials
     serpapi_key = env_serpapi
     hf_token = env_hf
 
